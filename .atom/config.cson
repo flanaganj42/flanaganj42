@@ -1,0 +1,58 @@
+"*":
+  Hydrogen:
+    debug: true
+    globalMode: true
+    kernelNotifications: true
+    startDir: "projectDirOfFile"
+  "atom-material-ui":
+    colors:
+      abaseColor: "#3c4680"
+      accentColor: "#a7952f"
+      genAccent: true
+      paintCursor: true
+      predefinedColor: "Indigo"
+    tabs:
+      compactTabs: true
+      noTabMinWidth: true
+      stretchedTabs: true
+      tintedTabBar: true
+    ui:
+      panelContrast: true
+      panelShadows: true
+  "coffee-autocompile":
+    compileOnSave: true
+  core:
+    closeDeletedFileTabs: true
+    disabledPackages: [
+      "python-suite"
+    ]
+    simpleFullScreenWindows: true
+    telemetryConsent: "limited"
+    themes: [
+      "atom-material-ui"
+      "base16-tomorrow-dark-theme"
+    ]
+    uriHandlerRegistration: "always"
+  editor:
+    fontSize: 37
+    invisibles: {}
+    multiCursorOnClick: false
+    scrollPastEnd: true
+    showInvisibles: true
+    softWrap: true
+    softWrapAtPreferredLineLength: true
+    zoomFontWhenCtrlScrolling: true
+  "exception-reporting":
+    userId: "9f59e0c9-d9f8-48d5-8943-14bd36449118"
+  github:
+    automaticCommitMessageWrapping: false
+    remoteFetchProtocol: "ssh"
+  "linter-ui-default":
+    showPanel: true
+  "markdown-preview":
+    useGitHubStyle: true
+  welcome: {}
+".breakpoints.hydrogen":
+  editor:
+    softWrap: true
+    softWrapAtPreferredLineLength: true
