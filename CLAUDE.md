@@ -488,7 +488,9 @@ SSH key used for ingest trigger: `~/.ssh/id_ed25519_new`.
 | GET | /models | key | Lists Ollama models |
 | POST | /generate | key | Ollama generate proxy; default model `gemma3:4b` |
 
-### Launchd — `/Library/LaunchDaemons/com.civicresilience.api.plist`
+### Launchd — `~/Library/LaunchAgents/com.civicresilience.api.plist`
+
+Uses a LaunchAgent (not a LaunchDaemon) — runs automatically as `jamesflanagan` on login, no sudo required. LaunchDaemon with `UserName` fails with "input/output error" on this macOS version.
 
 Uses a bash wrapper (`~/api/start.sh`) so launchd invokes `/bin/bash` rather than the Python.framework binary directly.
 
@@ -504,8 +506,6 @@ Uses a bash wrapper (`~/api/start.sh`) so launchd invokes `/bin/bash` rather tha
     <string>/bin/bash</string>
     <string>/Users/jamesflanagan/api/start.sh</string>
   </array>
-  <key>UserName</key>
-  <string>jamesflanagan</string>
   <key>RunAtLoad</key>
   <true/>
   <key>KeepAlive</key>
@@ -520,16 +520,16 @@ Uses a bash wrapper (`~/api/start.sh`) so launchd invokes `/bin/bash` rather tha
 </plist>
 ```
 
-`~/api/start.sh` reads `/etc/civicresilience-key` and execs uvicorn.
+`~/api/start.sh` reads `/etc/civicresilience-key` (chmod 644, owned root) and execs uvicorn.
 
-Load / reload:
+Load / reload (no sudo):
 ```bash
-sudo launchctl bootout system/com.civicresilience.api 2>/dev/null
-sudo launchctl bootstrap system /Library/LaunchDaemons/com.civicresilience.api.plist
+launchctl bootout gui/$(id -u)/com.civicresilience.api 2>/dev/null
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.civicresilience.api.plist
 ```
 
 Logs: `tail -f /tmp/civicresilience-api.log`
-Status: `sudo launchctl list | grep civicresilience`
+Status: `launchctl list | grep civicresilience`
 
 ### Requirements
 ```
