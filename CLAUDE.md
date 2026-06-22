@@ -328,7 +328,7 @@ docker run -d --name uptime-kuma --restart always \
 |-----|--------|--------|
 | node-lenovo | 192.168.12.215:9100 | up |
 | node-macmini | 192.168.12.200:9100 | up |
-| node-hp | 192.168.12.212:9182 | down — windows_exporter not responding |
+| node-hp | 192.168.12.212:9182 | up |
 | cadvisor | 192.168.12.215:8081 | up |
 | ray | 192.168.12.215:8076 | up |
 | qdrant | 192.168.12.215:6333/metrics | up |
@@ -336,7 +336,7 @@ docker run -d --name uptime-kuma --restart always \
 ### node_exporter per node
 - **Lenovo**: systemd service `node-exporter`, binary `/usr/local/bin/node_exporter`, port 9100
 - **Mac Mini**: Homebrew — `brew services start node_exporter`, port 9100
-- **HP**: windows_exporter MSI install, port 9182, runs as Windows service — currently not responding; check service is running and firewall allows inbound 9182 from 192.168.12.215
+- **HP**: windows_exporter MSI install, port 9182, runs as Windows service
 
 ### Grafana dashboard IDs (import via Dashboards → Import → ID)
 | ID | Dashboard |
