@@ -19,7 +19,8 @@
 - Start: `sudo systemctl start ray-head`
 - Stop: `sudo systemctl stop ray-head`
 - Logs: `journalctl -u ray-head -n 50`
-- Started with: `--dashboard-host=0.0.0.0 --dashboard-port=8265`
+- Started with: `--dashboard-host=0.0.0.0 --dashboard-port=8265 --metrics-export-port=8076`
+- Prometheus metrics: `http://192.168.12.215:8076/metrics`
 
 ### Worker — HP Windows (192.168.12.212)
 - Task Scheduler task: `RayWorker`
@@ -292,7 +293,7 @@ for r in results:
 |---------|-----|-------|
 | Grafana | http://192.168.12.215:3001 | Container: `ray-grafana`; admin/admin on first login |
 | Prometheus | http://192.168.12.215:9090 | Container: `ray-prometheus`; 30d retention |
-| cAdvisor | http://192.168.12.215:8080 | Container: `cadvisor`; Docker container metrics |
+| cAdvisor | http://192.168.12.215:8081 | Container: `cadvisor`; Docker container metrics (8080 taken by Open WebUI) |
 | Uptime Kuma | http://192.168.12.215:3002 | Container: `uptime-kuma`; endpoint monitoring + alerts |
 
 ### Docker Compose
@@ -308,20 +309,34 @@ docker compose logs -f ray-prometheus
 
 Grafana runs on the `host` network. Prometheus data in `prometheus-data` volume, Grafana data in `grafana-data` volume.
 
+cAdvisor runs standalone (not in the compose file) on port 8081 (8080 is taken by Open WebUI):
+```bash
+docker run -d --name cadvisor --restart always -p 8081:8080 \
+  --volume=/:/rootfs:ro --volume=/var/run:/var/run:ro \
+  --volume=/sys:/sys:ro --volume=/var/lib/docker/:/var/lib/docker:ro \
+  gcr.io/cadvisor/cadvisor:latest
+```
+
+Uptime Kuma runs standalone on port 3002:
+```bash
+docker run -d --name uptime-kuma --restart always \
+  -p 3002:3001 -v uptime-kuma:/app/data louislam/uptime-kuma:1
+```
+
 ### Prometheus scrape targets
-| Job | Target | What |
-|-----|--------|------|
-| node-lenovo | 192.168.12.215:9100 | System metrics |
-| node-macmini | 192.168.12.200:9100 | System metrics |
-| node-hp | 192.168.12.212:9182 | System metrics (windows_exporter) |
-| cadvisor | cadvisor:8080 | Docker container metrics |
-| ray | 192.168.12.215:8265/api/prometheus_metrics | Ray cluster |
-| qdrant | qdrant:6333/metrics | Vector DB |
+| Job | Target | Status |
+|-----|--------|--------|
+| node-lenovo | 192.168.12.215:9100 | up |
+| node-macmini | 192.168.12.200:9100 | up |
+| node-hp | 192.168.12.212:9182 | down — windows_exporter not responding |
+| cadvisor | 192.168.12.215:8081 | up |
+| ray | 192.168.12.215:8076 | up |
+| qdrant | 192.168.12.215:6333/metrics | up |
 
 ### node_exporter per node
-- **Lenovo**: systemd service `node-exporter`, port 9100
-- **Mac Mini**: launchd `com.node-exporter`, port 9100, binary at `/opt/homebrew/bin/node_exporter`
-- **HP**: windows_exporter MSI install, port 9182, runs as Windows service
+- **Lenovo**: systemd service `node-exporter`, binary `/usr/local/bin/node_exporter`, port 9100
+- **Mac Mini**: Homebrew — `brew services start node_exporter`, port 9100
+- **HP**: windows_exporter MSI install, port 9182, runs as Windows service — currently not responding; check service is running and firewall allows inbound 9182 from 192.168.12.215
 
 ### Grafana dashboard IDs (import via Dashboards → Import → ID)
 | ID | Dashboard |
@@ -330,14 +345,14 @@ Grafana runs on the `host` network. Prometheus data in `prometheus-data` volume,
 | 14282 | Docker cAdvisor — container resource usage |
 | 17323 | Ray — cluster tasks and actors |
 
-Prometheus data source URL (set in Grafana): `http://prometheus:9090`
+Prometheus data source URL (set in Grafana): `http://localhost:9090` (ray-grafana runs on host network)
 
 ### UFW ports (Lenovo)
 ```bash
 sudo ufw allow 9090/tcp   # Prometheus
 sudo ufw allow 3001/tcp   # Grafana
 sudo ufw allow 3002/tcp   # Uptime Kuma
-sudo ufw allow 8080/tcp   # cAdvisor
+sudo ufw allow 8081/tcp   # cAdvisor
 sudo ufw allow 9100/tcp   # node_exporter
 ```
 
