@@ -137,17 +137,10 @@ sudo /usr/libexec/ApplicationFirewall/socketfilterfw --unblockapp /usr/local/bin
 
 ## Qdrant ↔ Open WebUI + Ray (RAG Pipeline)
 
-### Docker network
-Open WebUI and Qdrant share `cluster-net` so they communicate by container name.
+### Docker networking
+Containers are on the default `bridge` network. There is no shared user-defined network, so containers cannot reach each other by name — use host IPs instead. Qdrant runs as a Docker Swarm service on the `labnet` overlay and is reachable at `192.168.12.215:6333`.
 
-```bash
-# One-time setup
-docker network create cluster-net
-docker network connect cluster-net open-webui
-docker network connect cluster-net qdrant
-```
-
-Verify: `docker exec open-webui curl -s http://qdrant:6333/healthz`
+Verify Qdrant reachable from Lenovo host: `curl -s http://192.168.12.215:6333/healthz`
 
 ### Open WebUI Docker config (full — includes Ollama + Qdrant + embeddings)
 ```bash
@@ -155,11 +148,10 @@ docker stop open-webui && docker rm open-webui
 docker run -d \
   --name open-webui \
   --restart always \
-  --network cluster-net \
   -p 3000:8080 \
   -e OLLAMA_BASE_URL=http://192.168.12.200:11434 \
   -e VECTOR_DB=qdrant \
-  -e QDRANT_URI=http://qdrant:6333 \
+  -e QDRANT_URI=http://192.168.12.215:6333 \
   -e RAG_EMBEDDING_ENGINE=ollama \
   -e RAG_OLLAMA_BASE_URL=http://192.168.12.200:11434 \
   -e RAG_EMBEDDING_MODEL=nomic-embed-text \
@@ -301,6 +293,7 @@ for r in results:
 | Grafana | http://192.168.12.215:3001 | Container: `ray-grafana`; admin/admin on first login |
 | Prometheus | http://192.168.12.215:9090 | Container: `ray-prometheus`; 30d retention |
 | cAdvisor | http://192.168.12.215:8080 | Container: `cadvisor`; Docker container metrics |
+| Uptime Kuma | http://192.168.12.215:3002 | Container: `uptime-kuma`; endpoint monitoring + alerts |
 
 ### Docker Compose
 Location: `~/monitoring/docker-compose.yml`
@@ -313,7 +306,7 @@ docker compose down
 docker compose logs -f ray-prometheus
 ```
 
-All containers on `cluster-net`. Prometheus data in `prometheus-data` volume, Grafana data in `grafana-data` volume.
+Grafana runs on the `host` network. Prometheus data in `prometheus-data` volume, Grafana data in `grafana-data` volume.
 
 ### Prometheus scrape targets
 | Job | Target | What |
@@ -343,6 +336,7 @@ Prometheus data source URL (set in Grafana): `http://prometheus:9090`
 ```bash
 sudo ufw allow 9090/tcp   # Prometheus
 sudo ufw allow 3001/tcp   # Grafana
+sudo ufw allow 3002/tcp   # Uptime Kuma
 sudo ufw allow 8080/tcp   # cAdvisor
 sudo ufw allow 9100/tcp   # node_exporter
 ```
