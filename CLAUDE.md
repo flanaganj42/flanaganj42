@@ -496,6 +496,15 @@ SSH key used for ingest trigger: `~/.ssh/id_ed25519_new`.
 | GET | /document/{path} | key | Serves file directly from NAS |
 | GET | /models | key | Lists Ollama models |
 | POST | /generate | key | Ollama generate proxy; default model `gemma3:4b` |
+| GET | /overlay/state | — | Live overlay state (CORS open to GitHub Pages) |
+| POST | /overlay/speaker | key | Set speaker name/title, show lower third |
+| DELETE | /overlay/speaker | key | Hide lower third |
+| POST | /overlay/ticker/items | key | Replace all ticker items |
+| POST | /overlay/ticker/prepend | key | Prepend one headline to ticker |
+| DELETE | /overlay/ticker | key | Reset ticker to defaults |
+| POST | /overlay/newsbot/run | key | Fetch RSS headlines and push to ticker |
+| GET | /overlay/newsbot/preview | key | Fetch headlines without pushing |
+| GET | /control | — | Local overlay control panel (LAN only) |
 
 ### Launchd — `~/Library/LaunchAgents/com.civicresilience.api.plist`
 
@@ -590,3 +599,80 @@ SSH → Lenovo james@192.168.12.215 (ingest trigger)
     ↓
 NAS /mnt/nas (Lenovo) / /Volumes/clusterstorage (Mac Mini)
 ```
+
+---
+
+## OBS Studio — Mac Mini
+
+### Profile
+`~/Library/Application Support/obs-studio/basic/` — profile: `Untitled`
+
+Settings: 1920×1080 base → 1280×720 output, 60 fps, Apple H.264 encoder, fragmented MOV recording to `~/Movies`, 48 kHz stereo audio.
+
+obs-backgroundremoval plugin installed.
+
+### Scenes
+| Scene | Contents |
+|-------|----------|
+| Scene | Iowa logo image, iPhone camera (Video Capture Device 2), audio input, Browser 2 (overlay), media sources |
+| Scene 2 | VCam camera (Video Capture Device 3), media sources, text label |
+
+**Browser 2** source in Scene is the CivicResilience overlay:
+- URL: `https://flanaganj42.github.io/civic-resilience/`
+- Size: 1920×1080, positioned at (0, 0), scale 1.0×1.0
+
+### OBS Overlay — `flanaganj42/civic-resilience` repo
+
+GitHub Pages site serving a full-screen animated overlay with lower-third, news ticker, and branding bug.
+
+Config file: `scenes.json` (polled every 30s for scene/layout changes)
+
+Live control: overlay polls `https://api.civicresilience.net/overlay/state` every **5 seconds** for instant updates without restarting OBS.
+
+#### Control panel
+Open in any browser on the Mac Mini:
+```
+http://localhost:8080/control
+```
+Paste API key once (stored in browser localStorage). Controls:
+- **Speaker name + title** → Show/Hide lower third (updates overlay in ~5s)
+- **Ticker management** → add, remove, or reset items
+- **Fetch News** → pulls RSS headlines and pushes to ticker immediately
+- **Auto-refresh** → schedule news fetch every N minutes
+
+#### News bot (`~/api/newsbot.py`)
+Scrapes 6 RSS feeds: NPR, BBC World, CBS News, PBS NewsHour, The Guardian, NY Times.
+Prioritises civic/community/emergency keywords. No extra deps (stdlib + certifi).
+
+Run manually:
+```bash
+python3 ~/api/newsbot.py
+```
+
+Push headlines via API:
+```bash
+curl -X POST https://api.civicresilience.net/overlay/newsbot/run \
+  -H "x-api-key: YOUR_KEY"
+```
+
+#### Lower third control (curl)
+```bash
+# Show speaker
+curl -X POST https://api.civicresilience.net/overlay/speaker \
+  -H "x-api-key: YOUR_KEY" -H "Content-Type: application/json" \
+  -d '{"name": "James Flanagano", "title": "Civic Resilience Network", "show": true}'
+
+# Hide
+curl -X DELETE https://api.civicresilience.net/overlay/speaker \
+  -H "x-api-key: YOUR_KEY"
+```
+
+#### Overlay state (public, no auth)
+```bash
+curl https://api.civicresilience.net/overlay/state
+```
+
+#### Notes
+- Overlay state is **in-memory** — resets to defaults when the API restarts. Use the control panel to re-set speaker info after a restart.
+- CORS on `/overlay/state` is open only to `flanaganj42.github.io` (GET only).
+- `scenes.json` in the repo controls scene layouts and fallback ticker content.
