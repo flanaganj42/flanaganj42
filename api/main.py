@@ -6,7 +6,8 @@ from urllib.parse import quote
 
 import httpx
 from fastapi import FastAPI, Depends, HTTPException, Header, BackgroundTasks
-from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
@@ -33,6 +34,13 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(title="CivicResilience API", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://flanaganj42.github.io"],
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
 
 # ── Health ───────────────────────────────────────────────────────────────────
 @app.get("/health")
@@ -64,6 +72,107 @@ async def health():
             "free_gb":  round(disk.free  / 1e9, 1) if disk else None,
         },
     }
+
+# ── Overlay state (in-memory) ────────────────────────────────────────────────
+_DEFAULT_TICKER = [
+    "Welcome to Civic Resilience Network — Live",
+    "civicresilience.net — Join the conversation",
+]
+_overlay: dict = {
+    "speaker_name":           "",
+    "speaker_title":          "",
+    "lower_third_visible":    False,
+    "lower_third_duration_ms": 6000,
+    "ticker_items":           list(_DEFAULT_TICKER),
+    "version":                0,
+}
+MAX_TICKER = 20
+
+@app.get("/overlay/state")
+async def overlay_state():
+    return _overlay
+
+class SpeakerRequest(BaseModel):
+    name: str
+    title: str = ""
+    show: bool = True
+    duration_ms: int = 6000
+
+@app.post("/overlay/speaker", dependencies=[Depends(require_key)])
+async def set_speaker(req: SpeakerRequest):
+    _overlay.update(
+        speaker_name=req.name,
+        speaker_title=req.title,
+        lower_third_visible=req.show,
+        lower_third_duration_ms=req.duration_ms,
+        version=_overlay["version"] + 1,
+    )
+    return _overlay
+
+@app.delete("/overlay/speaker", dependencies=[Depends(require_key)])
+async def hide_speaker():
+    _overlay["lower_third_visible"] = False
+    _overlay["version"] += 1
+    return _overlay
+
+class TickerItemsRequest(BaseModel):
+    items: list[str]
+
+@app.post("/overlay/ticker/items", dependencies=[Depends(require_key)])
+async def set_ticker_items(req: TickerItemsRequest):
+    _overlay["ticker_items"] = req.items[:MAX_TICKER]
+    _overlay["version"] += 1
+    return _overlay
+
+class HeadlineRequest(BaseModel):
+    headline: str
+
+@app.post("/overlay/ticker/prepend", dependencies=[Depends(require_key)])
+async def prepend_headline(req: HeadlineRequest):
+    items = [req.headline] + _overlay["ticker_items"]
+    _overlay["ticker_items"] = items[:MAX_TICKER]
+    _overlay["version"] += 1
+    return _overlay
+
+@app.delete("/overlay/ticker", dependencies=[Depends(require_key)])
+async def reset_ticker():
+    _overlay["ticker_items"] = list(_DEFAULT_TICKER)
+    _overlay["version"] += 1
+    return _overlay
+
+@app.get("/control", response_class=HTMLResponse)
+async def control_panel():
+    p = Path(__file__).parent / "control.html"
+    if not p.exists():
+        raise HTTPException(404, "control.html not found")
+    return p.read_text()
+
+@app.post("/overlay/newsbot/run", dependencies=[Depends(require_key)])
+async def newsbot_run():
+    import importlib.util, sys
+    nb_path = Path(__file__).parent / "newsbot.py"
+    if not nb_path.exists():
+        raise HTTPException(404, "newsbot.py not found")
+    spec = importlib.util.spec_from_file_location("newsbot", nb_path)
+    nb   = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(nb)
+    headlines, sources = nb.fetch_headlines()
+    if headlines:
+        _overlay["ticker_items"] = headlines[:MAX_TICKER]
+        _overlay["version"] += 1
+    return {"pushed": len(headlines), "sources": sources, "headlines": headlines}
+
+@app.get("/overlay/newsbot/preview", dependencies=[Depends(require_key)])
+async def newsbot_preview():
+    import importlib.util
+    nb_path = Path(__file__).parent / "newsbot.py"
+    if not nb_path.exists():
+        raise HTTPException(404, "newsbot.py not found")
+    spec = importlib.util.spec_from_file_location("newsbot", nb_path)
+    nb   = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(nb)
+    headlines, sources = nb.fetch_headlines()
+    return {"headlines": headlines, "sources": sources}
 
 # ── Ingest state ─────────────────────────────────────────────────────────────
 INGEST_LOG = Path("/tmp/ingest.log")

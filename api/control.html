@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivicResilience — Overlay Control</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  background: #0d1b2a; color: #e0e8f0;
+  min-height: 100vh; padding: 24px;
+}
+h1 { font-size: 22px; font-weight: 700; color: #00b4d8; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: #5a7a9a; margin-bottom: 28px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 960px; }
+.card {
+  background: #121f30; border: 1px solid #1e3050;
+  border-radius: 10px; padding: 20px;
+}
+.card h2 { font-size: 14px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: #00b4d8; margin-bottom: 16px; }
+label { display: block; font-size: 12px; color: #7a9ab8; margin-bottom: 4px; }
+input, textarea {
+  width: 100%; background: #0d1b2a; border: 1px solid #1e3050;
+  color: #e0e8f0; border-radius: 6px; padding: 9px 12px;
+  font-size: 14px; font-family: inherit;
+  outline: none; transition: border-color .15s;
+  margin-bottom: 12px;
+}
+input:focus, textarea:focus { border-color: #00b4d8; }
+textarea { resize: vertical; min-height: 70px; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+button {
+  padding: 9px 18px; border: none; border-radius: 6px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: opacity .15s;
+}
+button:hover { opacity: .85; }
+.btn-primary   { background: #00b4d8; color: #0d1b2a; }
+.btn-danger    { background: #c0392b; color: #fff; }
+.btn-secondary { background: #1e3050; color: #a0bcd8; }
+.btn-success   { background: #27ae60; color: #fff; }
+.status-dot {
+  display: inline-block; width: 9px; height: 9px;
+  border-radius: 50%; margin-right: 7px;
+  animation: blink 1.4s infinite;
+}
+.dot-live { background: #00b4d8; }
+.dot-off  { background: #c0392b; animation: none; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+.state-preview {
+  background: #0a1220; border: 1px solid #1a2a40;
+  border-radius: 6px; padding: 12px 14px;
+  font-size: 12px; color: #5a7a9a;
+  margin-bottom: 14px; min-height: 44px;
+}
+.state-preview strong { color: #a0c8e8; }
+#ticker-list {
+  list-style: none; padding: 0;
+  max-height: 200px; overflow-y: auto;
+  margin-bottom: 12px;
+}
+#ticker-list li {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-radius: 5px;
+  font-size: 13px; margin-bottom: 4px;
+  background: #0a1220; border: 1px solid #1a2a40;
+}
+#ticker-list li span { flex: 1; }
+#ticker-list li button {
+  padding: 2px 8px; font-size: 11px;
+  background: #3a1018; color: #e05050; border: none;
+  border-radius: 4px;
+}
+.full-span { grid-column: 1 / -1; }
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: #00b4d8; color: #0d1b2a;
+  padding: 10px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  opacity: 0; transition: opacity .25s;
+  pointer-events: none;
+}
+#toast.show { opacity: 1; }
+.key-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 18px; }
+.key-row input { margin-bottom: 0; flex: 1; font-family: monospace; font-size: 12px; }
+.key-row button { white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<h1>Overlay Control</h1>
+<div class="subtitle">CivicResilience Network — OBS live controls · <span id="api-url"></span></div>
+
+<div class="key-row">
+  <div style="flex:1">
+    <label>API Key <span style="color:#3a5a7a">(saved in browser, never sent to third parties)</span></label>
+    <input type="password" id="api-key" placeholder="Paste API key once — stored in localStorage">
+  </div>
+  <button class="btn-secondary" onclick="saveKey()">Save Key</button>
+</div>
+
+<div class="grid">
+
+  <!-- Lower Third -->
+  <div class="card">
+    <h2>Lower Third</h2>
+    <div class="state-preview" id="lt-preview">Loading…</div>
+    <label>Speaker Name</label>
+    <input type="text" id="lt-name" placeholder="James Flanagano">
+    <label>Title / Organisation</label>
+    <input type="text" id="lt-title" placeholder="Civic Resilience Network">
+    <label>Duration (seconds)</label>
+    <input type="number" id="lt-dur" value="6" min="2" max="60">
+    <div class="btn-row">
+      <button class="btn-primary" onclick="showSpeaker()">Show Lower Third</button>
+      <button class="btn-danger"  onclick="hideSpeaker()">Hide</button>
+    </div>
+  </div>
+
+  <!-- Ticker -->
+  <div class="card">
+    <h2>News Ticker</h2>
+    <ul id="ticker-list"></ul>
+    <label>Add headline (prepend to top)</label>
+    <textarea id="new-headline" placeholder="Breaking: Council approves new community centre…" rows="2"></textarea>
+    <div class="btn-row">
+      <button class="btn-success"   onclick="prependHeadline()">Prepend</button>
+      <button class="btn-secondary" onclick="runNewsBot()">Fetch News</button>
+      <button class="btn-danger"    onclick="resetTicker()">Reset</button>
+    </div>
+  </div>
+
+  <!-- News Bot -->
+  <div class="card full-span">
+    <h2>News Bot — Auto Feed</h2>
+    <div class="state-preview" id="newsbot-status">Press "Fetch News" to pull live headlines from RSS feeds.</div>
+    <div style="margin-top:12px">
+      <label>Auto-refresh interval (minutes, 0 = off)</label>
+      <div class="btn-row">
+        <input type="number" id="auto-interval" value="0" min="0" max="60" style="width:120px;margin:0">
+        <button class="btn-secondary" onclick="setAutoRefresh()">Apply</button>
+        <button class="btn-secondary" onclick="fetchNewsPreview()">Preview headlines (no push)</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const BASE = window.location.origin;
+document.getElementById('api-url').textContent = BASE;
+
+let apiKey = localStorage.getItem('cr_api_key') || '';
+document.getElementById('api-key').value = apiKey;
+
+function saveKey() {
+  apiKey = document.getElementById('api-key').value.trim();
+  localStorage.setItem('cr_api_key', apiKey);
+  toast('API key saved');
+}
+
+// ─── API helpers ─────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  if (!apiKey) { toast('Enter your API key first', true); return null; }
+  try {
+    const r = await fetch(BASE + path, {
+      method,
+      headers: { 'x-api-key': apiKey, 'content-type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (!r.ok) { toast(`Error ${r.status}`, true); return null; }
+    return r.json();
+  } catch(e) { toast('Network error', true); return null; }
+}
+
+// ─── State polling ────────────────────────────────────────────────────────────
+let _version = -1;
+async function pollState() {
+  try {
+    const s = await fetch(BASE + '/overlay/state').then(r => r.json());
+    if (s.version === _version) return;
+    _version = s.version;
+    renderState(s);
+  } catch(e) {}
+}
+
+function renderState(s) {
+  const ltP = document.getElementById('lt-preview');
+  if (s.lower_third_visible) {
+    ltP.innerHTML = `<span class="status-dot dot-live"></span><strong>${esc(s.speaker_name)}</strong> — ${esc(s.speaker_title)}`;
+    document.getElementById('lt-name').value  = s.speaker_name;
+    document.getElementById('lt-title').value = s.speaker_title;
+  } else {
+    ltP.innerHTML = `<span class="status-dot dot-off"></span>Hidden`;
+  }
+  renderTicker(s.ticker_items || []);
+}
+
+function renderTicker(items) {
+  const ul = document.getElementById('ticker-list');
+  ul.innerHTML = items.map((t, i) =>
+    `<li><span>${esc(t)}</span><button onclick="removeItem(${i})">✕</button></li>`
+  ).join('');
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── Lower third controls ─────────────────────────────────────────────────────
+async function showSpeaker() {
+  const name  = document.getElementById('lt-name').value.trim();
+  const title = document.getElementById('lt-title').value.trim();
+  const dur   = parseInt(document.getElementById('lt-dur').value) * 1000;
+  if (!name) { toast('Enter a speaker name', true); return; }
+  const s = await api('POST', '/overlay/speaker', { name, title, show: true, duration_ms: dur });
+  if (s) { renderState(s); toast('Lower third live'); }
+}
+
+async function hideSpeaker() {
+  const s = await api('DELETE', '/overlay/speaker');
+  if (s) { renderState(s); toast('Lower third hidden'); }
+}
+
+// ─── Ticker controls ──────────────────────────────────────────────────────────
+async function prependHeadline() {
+  const h = document.getElementById('new-headline').value.trim();
+  if (!h) return;
+  const s = await api('POST', '/overlay/ticker/prepend', { headline: h });
+  if (s) { renderTicker(s.ticker_items); document.getElementById('new-headline').value = ''; toast('Headline added'); }
+}
+
+async function removeItem(idx) {
+  const r = await fetch(BASE + '/overlay/state').then(r => r.json());
+  const items = (r.ticker_items || []).filter((_, i) => i !== idx);
+  const s = await api('POST', '/overlay/ticker/items', { items });
+  if (s) { renderTicker(s.ticker_items); toast('Item removed'); }
+}
+
+async function resetTicker() {
+  const s = await api('DELETE', '/overlay/ticker');
+  if (s) { renderTicker(s.ticker_items); toast('Ticker reset'); }
+}
+
+// ─── News bot ─────────────────────────────────────────────────────────────────
+async function runNewsBot() {
+  const status = document.getElementById('newsbot-status');
+  status.textContent = 'Fetching headlines…';
+  try {
+    const r = await fetch(BASE + '/overlay/newsbot/run', {
+      method: 'POST',
+      headers: { 'x-api-key': apiKey },
+    });
+    if (!r.ok) { status.textContent = `Error ${r.status}`; return; }
+    const d = await r.json();
+    status.innerHTML = `Pushed <strong>${d.pushed}</strong> headlines · ${d.sources} sources · ${new Date().toLocaleTimeString()}`;
+    await pollState();
+  } catch(e) { status.textContent = 'Failed: ' + e.message; }
+}
+
+async function fetchNewsPreview() {
+  const status = document.getElementById('newsbot-status');
+  status.textContent = 'Fetching preview…';
+  try {
+    const r = await fetch(BASE + '/overlay/newsbot/preview', {
+      headers: { 'x-api-key': apiKey },
+    });
+    if (!r.ok) { status.textContent = `Error ${r.status}`; return; }
+    const d = await r.json();
+    status.innerHTML = `<strong>Preview (not pushed):</strong><br>` +
+      d.headlines.map(h => `• ${esc(h)}`).join('<br>');
+  } catch(e) { status.textContent = 'Failed: ' + e.message; }
+}
+
+// ─── Auto-refresh ─────────────────────────────────────────────────────────────
+let autoTimer = null;
+function setAutoRefresh() {
+  const mins = parseInt(document.getElementById('auto-interval').value);
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  if (mins > 0) {
+    autoTimer = setInterval(runNewsBot, mins * 60 * 1000);
+    toast(`Auto-refresh every ${mins} min`);
+  } else {
+    toast('Auto-refresh off');
+  }
+}
+
+// ─── Toast ───────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg, err) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = err ? '#c0392b' : '#00b4d8';
+  el.style.color = err ? '#fff' : '#0d1b2a';
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ─── Boot ────────────────────────────────────────────────────────────────────
+pollState();
+setInterval(pollState, 4000);
+</script>
+</body>
+</html>
