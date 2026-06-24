@@ -5,7 +5,8 @@ from pathlib import Path
 from urllib.parse import quote
 
 import httpx
-from fastapi import FastAPI, Depends, HTTPException, Header, BackgroundTasks
+import news as _news
+from fastapi import FastAPI, Depends, HTTPException, Header, BackgroundTasks, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
@@ -31,13 +32,15 @@ def require_key(x_api_key: str = Header(...)):
 # ── App ──────────────────────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    loop = asyncio.get_event_loop()
+    loop.run_in_executor(None, _news.refresh)
     yield
 
 app = FastAPI(title="CivicResilience API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://flanaganj42.github.io"],
+    allow_origins=["https://flanaganj42.github.io", "https://civicresilience.net"],
     allow_methods=["GET"],
     allow_headers=["*"],
 )
@@ -325,3 +328,60 @@ async def generate(req: GenerateRequest):
         )
     r.raise_for_status()
     return r.json()
+
+# ── News feed ─────────────────────────────────────────────────────────────────
+@app.get("/news", response_class=HTMLResponse)
+async def news_page():
+    p = Path(__file__).parent / "news.html"
+    if not p.exists():
+        raise HTTPException(404, "news.html not found")
+    return p.read_text()
+
+@app.get("/news/feed")
+async def news_feed(limit: int = Query(60, le=200)):
+    return {
+        "stories": _news.get_feed(limit),
+        "stats": _news.stats(),
+    }
+
+@app.get("/news/blindspot")
+async def news_blindspot(limit: int = Query(25, le=100)):
+    return {"stories": _news.get_blindspot(limit), "stats": _news.stats()}
+
+@app.get("/news/uplifted")
+async def news_uplifted():
+    return {"stories": _news.get_uplifted(), "stats": _news.stats()}
+
+@app.get("/news/stats")
+async def news_stats():
+    return _news.stats()
+
+@app.post("/news/refresh", dependencies=[Depends(require_key)])
+async def news_refresh():
+    loop = asyncio.get_event_loop()
+    count = await loop.run_in_executor(None, _news.refresh)
+    return {"stories": count, "stats": _news.stats()}
+
+class UpliftRequest(BaseModel):
+    note: str = ""
+
+@app.post("/news/uplift/{story_id}", dependencies=[Depends(require_key)])
+async def uplift_story(story_id: str, req: UpliftRequest = UpliftRequest()):
+    found = _news.uplift(story_id, req.note)
+    if not found:
+        raise HTTPException(404, "Story not found — try refreshing the feed first")
+    _overlay["ticker_items"] = _news.ticker_items(15)
+    _overlay["version"] += 1
+    return {"uplifted": story_id, "note": req.note}
+
+@app.delete("/news/uplift/{story_id}", dependencies=[Depends(require_key)])
+async def remove_uplift(story_id: str):
+    _news.remove_uplift(story_id)
+    return {"removed": story_id}
+
+@app.post("/news/push-ticker", dependencies=[Depends(require_key)])
+async def push_news_ticker(limit: int = Query(12, le=20)):
+    items = _news.ticker_items(limit)
+    _overlay["ticker_items"] = items
+    _overlay["version"] += 1
+    return {"pushed": len(items), "items": items}
