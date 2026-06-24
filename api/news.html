@@ -54,15 +54,16 @@ header{background:rgba(12,31,53,0.95);border-bottom:1px solid var(--border);padd
 .filter-count{background:rgba(255,255,255,.15);border-radius:8px;padding:0 6px;font-size:11px;margin-left:4px;}
 .push-all-btn{margin-left:auto;}
 
-/* ── Main grid ── */
-main{max-width:1280px;margin:0 auto;padding:20px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px;}
+/* ── Main feed — vertical scroll ── */
+main{max-width:860px;margin:0 auto;padding:20px 24px;display:flex;flex-direction:column;gap:12px;}
 
 /* ── Story card ── */
-.story-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:.2s;position:relative;}
-.story-card:hover{border-color:var(--primary-dim);box-shadow:0 0 20px rgba(0,180,216,.1);}
+.story-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;transition:.2s;position:relative;}
+.story-card:hover{border-color:var(--primary-dim);box-shadow:0 2px 20px rgba(0,180,216,.1);}
 .story-card.uplifted{border-color:var(--uplift);background:rgba(251,191,36,.04);}
 .story-card.blindspot{border-left:3px solid var(--blindspot);}
 
+.card-top{display:flex;align-items:flex-start;gap:12px;}
 .card-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
 .badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.04em;}
 .badge-uplifted{background:rgba(251,191,36,.2);color:var(--uplift);border:1px solid rgba(251,191,36,.4);}
@@ -70,19 +71,23 @@ main{max-width:1280px;margin:0 auto;padding:20px 24px;display:grid;grid-template
 .badge-multi{background:rgba(0,180,216,.15);color:var(--primary);}
 .badge-civic{background:rgba(16,185,129,.15);color:#6ee7b7;}
 
-.card-title{font-size:15px;font-weight:600;line-height:1.4;color:var(--white);}
+.card-title{font-size:16px;font-weight:700;line-height:1.45;color:var(--white);}
 .card-title a{color:inherit;text-decoration:none;}
 .card-title a:hover{color:var(--primary);}
 
+.card-summary{font-size:13px;color:#8da8c4;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+
 /* Source diversity bar */
-.diversity-bar{height:5px;border-radius:3px;display:flex;overflow:hidden;gap:1px;}
+.diversity-bar{height:4px;border-radius:3px;display:flex;overflow:hidden;gap:1px;}
 .diversity-seg{height:100%;border-radius:2px;min-width:4px;}
 
-.source-pills{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.card-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.source-pills{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
 .age{font-size:11px;color:var(--muted);margin-left:auto;}
+.source-names{font-size:11px;color:var(--muted);}
 
 /* Card actions */
-.card-actions{display:flex;gap:8px;align-items:center;margin-top:2px;}
+.card-actions{display:flex;gap:8px;align-items:center;padding-top:4px;border-top:1px solid rgba(26,58,92,.6);}
 .uplift-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;}
 .uplift-btn:hover{border-color:var(--uplift);color:var(--uplift);}
 .uplift-btn.active{background:rgba(251,191,36,.15);border-color:var(--uplift);color:var(--uplift);}
@@ -276,28 +281,35 @@ function storyCard(s) {
     ? `<a href="${s.urls[0]}" target="_blank" rel="noopener">${escHtml(s.title)}</a>`
     : escHtml(s.title);
 
-  const pills = s.source_types.map(t =>
+  const pills = [...new Set(s.source_types)].map(t =>
     `<span class="type-pill type-${t}">${t}</span>`
   ).join('');
 
-  const srcNames = s.sources.slice(0,4).map(n => `<span style="font-size:11px;color:var(--muted)">${escHtml(n)}</span>`).join('');
-  const more = s.sources.length > 4 ? `<span style="font-size:11px;color:var(--muted)">+${s.sources.length-4} more</span>` : '';
+  const srcNames = s.sources.slice(0, 5).map(n => escHtml(n)).join(' · ');
+  const more = s.sources.length > 5 ? ` +${s.sources.length - 5} more` : '';
 
   const bar = diversityBar(s.type_counts || {}, s.coverage_count);
   const age = s.age_minutes < 60
     ? `${s.age_minutes}m ago`
-    : `${Math.round(s.age_minutes/60)}h ago`;
+    : `${Math.round(s.age_minutes / 60)}h ago`;
 
   const upliftActive = s.uplifted ? 'active' : '';
   const upliftLabel = s.uplifted ? '⬆ Uplifted' : '⬆ Uplift';
+  const summaryHtml = s.summary
+    ? `<div class="card-summary">${escHtml(s.summary)}</div>`
+    : '';
 
   return `
 <div class="story-card${s.uplifted?' uplifted':''}${s.is_blindspot&&!s.uplifted?' blindspot':''}" id="card-${s.id}">
-  <div class="card-badges">${badges.join('')}</div>
+  ${badges.length ? `<div class="card-badges">${badges.join('')}</div>` : ''}
   <div class="card-title">${titleHtml}</div>
+  ${summaryHtml}
   <div class="diversity-bar">${bar}</div>
-  <div class="source-pills">${pills}<span class="age">${age}</span></div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">${srcNames}${more}</div>
+  <div class="card-meta">
+    <div class="source-pills">${pills}</div>
+    <span class="source-names">${srcNames}${more}</span>
+    <span class="age">${age}</span>
+  </div>
   <div class="card-actions">
     <button class="uplift-btn ${upliftActive}" onclick="handleUplift('${s.id}',${s.uplifted})">${upliftLabel}</button>
     <button class="ticker-btn" id="ticker-${s.id}" onclick="pushStoryToTicker('${s.id}','${escAttr(s.title)}')">📺 Push to Ticker</button>

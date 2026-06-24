@@ -75,6 +75,7 @@ SOURCE_TYPE_ORDER = ["local", "government", "national", "nonprofit"]
 class Story:
     id: str
     title: str
+    summary: str = ""
     sources: list[str] = field(default_factory=list)
     source_types: list[str] = field(default_factory=list)
     urls: list[str] = field(default_factory=list)
@@ -92,6 +93,7 @@ class Story:
         return {
             "id": self.id,
             "title": self.title,
+            "summary": self.summary,
             "sources": self.sources,
             "source_types": unique_types,
             "type_counts": type_counts,
@@ -136,8 +138,26 @@ def _clean_title(title: str) -> str:
     return title[:140]
 
 
-def _fetch_feed(src: dict) -> list[tuple[str, str, str, str]]:
-    """Returns list of (title, source_name, source_type, url)."""
+def _strip_html(text: str) -> str:
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"&nbsp;", " ", text)
+    text = re.sub(r"&amp;", "&", text)
+    text = re.sub(r"&lt;", "<", text)
+    text = re.sub(r"&gt;", ">", text)
+    text = re.sub(r"&quot;", '"', text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _trim_summary(text: str, max_chars: int = 220) -> str:
+    text = _strip_html(text)
+    if len(text) <= max_chars:
+        return text
+    cut = text[:max_chars].rfind(" ")
+    return text[: cut if cut > 0 else max_chars] + "…"
+
+
+def _fetch_feed(src: dict) -> list[tuple[str, str, str, str, str]]:
+    """Returns list of (title, source_name, source_type, url, summary)."""
     try:
         req = urllib.request.Request(
             src["url"], headers={"User-Agent": "CivicResilience-NewsBot/2.0"}
@@ -149,38 +169,42 @@ def _fetch_feed(src: dict) -> list[tuple[str, str, str, str]]:
         for item in root.findall(".//item")[:15]:
             t = _clean_title((item.findtext("title") or "").strip())
             u = (item.findtext("link") or "").strip()
+            desc = _trim_summary(item.findtext("description") or "")
             if t:
-                results.append((t, src["name"], src["type"], u))
+                results.append((t, src["name"], src["type"], u, desc))
         atom_ns = "http://www.w3.org/2005/Atom"
         for entry in root.findall(f".//{{{atom_ns}}}entry")[:15]:
             t_el = entry.find(f"{{{atom_ns}}}title")
             l_el = entry.find(f"{{{atom_ns}}}link")
+            s_el = entry.find(f"{{{atom_ns}}}summary") or entry.find(f"{{{atom_ns}}}content")
             if t_el is not None and t_el.text:
                 t = _clean_title(t_el.text.strip())
                 u = (l_el.get("href", "") if l_el is not None else "")
-                results.append((t, src["name"], src["type"], u))
+                desc = _trim_summary(s_el.text or "" if s_el is not None else "")
+                results.append((t, src["name"], src["type"], u, desc))
         return results
     except Exception:
         return []
 
 
-def _cluster(raw: list[tuple[str, str, str, str]]) -> list[Story]:
+def _cluster(raw: list[tuple[str, str, str, str, str]]) -> list[Story]:
     used = [False] * len(raw)
     clusters: list[Story] = []
-    for i, (title_i, src_i, type_i, url_i) in enumerate(raw):
+    for i, (title_i, src_i, type_i, url_i, desc_i) in enumerate(raw):
         if used[i]:
             continue
         words_i = _norm(title_i)
         s = Story(
             id=_story_id(title_i),
             title=title_i,
+            summary=desc_i,
             sources=[src_i],
             source_types=[type_i],
             urls=[url_i] if url_i else [],
             civic_score=_civic(title_i),
         )
         used[i] = True
-        for j, (title_j, src_j, type_j, url_j) in enumerate(raw):
+        for j, (title_j, src_j, type_j, url_j, desc_j) in enumerate(raw):
             if used[j] or j == i:
                 continue
             words_j = _norm(title_j)
@@ -193,6 +217,9 @@ def _cluster(raw: list[tuple[str, str, str, str]]) -> list[Story]:
                     s.source_types.append(type_j)
                 if url_j and url_j not in s.urls:
                     s.urls.append(url_j)
+                # Use longest summary available
+                if not s.summary and desc_j:
+                    s.summary = desc_j
                 used[j] = True
         s.coverage_count = len(s.sources)
         clusters.append(s)
@@ -205,7 +232,7 @@ def _sort_key(s: Story) -> tuple:
 
 # ── Public API ────────────────────────────────────────────────────────────────
 def refresh() -> int:
-    raw: list[tuple[str, str, str, str]] = []
+    raw: list[tuple[str, str, str, str, str]] = []
     for src in SOURCES:
         raw.extend(_fetch_feed(src))
 
