@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Civic Resilience Network — Community news intelligence, civic engagement tools, and local broadcast resources for Iowa and beyond.">
+<title>Civic Resilience Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#050f1c;--bg2:#0c1f35;--bg3:#0f2540;
+  --border:#1a3a5c;--border2:#1e4a70;
+  --primary:#00b4d8;--primary-dim:#0090aa;--primary-glow:rgba(0,180,216,0.25);
+  --accent:#48cae4;
+  --national:#3b82f6;--government:#10b981;--local:#f59e0b;--nonprofit:#8b5cf6;
+  --uplift:#fbbf24;
+  --text:#e2e8f0;--muted:#64748b;--muted2:#8da8c4;--white:#fff;
+  --radius:12px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6;overflow-x:hidden;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 32px;height:60px;display:flex;align-items:center;background:rgba(5,15,28,0.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(26,58,92,0.6);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 10px #ef4444;animation:blink 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.nav-wordmark{font-size:15px;font-weight:700;color:var(--primary);letter-spacing:.05em;text-transform:uppercase;}
+.nav-links{display:flex;gap:4px;margin-left:auto;align-items:center;}
+.nav-links a{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--muted2);text-decoration:none;transition:.15s;}
+.nav-links a:hover{color:var(--white);background:rgba(255,255,255,.06);}
+.nav-cta{background:var(--primary)!important;color:#000!important;font-weight:700!important;}
+.nav-cta:hover{background:var(--primary-dim)!important;}
+
+/* ── HERO ── */
+#hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:80px 32px 60px;}
+#hero-canvas{position:absolute;inset:0;z-index:0;}
+.hero-inner{position:relative;z-index:1;text-align:center;max-width:800px;margin:0 auto;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;border:1px solid rgba(0,180,216,.35);background:rgba(0,180,216,.08);font-size:12px;font-weight:600;color:var(--primary);letter-spacing:.1em;text-transform:uppercase;margin-bottom:24px;}
+.hero-title{font-size:clamp(36px,6vw,72px);font-weight:900;line-height:1.1;color:var(--white);letter-spacing:-.02em;margin-bottom:20px;}
+.hero-title span{color:var(--primary);}
+.hero-sub{font-size:clamp(16px,2vw,20px);color:var(--muted2);font-weight:300;max-width:580px;margin:0 auto 36px;}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;transition:.2s;border:none;cursor:pointer;}
+.btn-primary{background:var(--primary);color:#000;}
+.btn-primary:hover{background:var(--primary-dim);transform:translateY(-1px);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text);}
+.btn-ghost:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-1px);}
+.hero-stats{display:flex;gap:40px;justify-content:center;margin-top:56px;flex-wrap:wrap;}
+.hero-stat{text-align:center;}
+.hero-stat-num{font-size:32px;font-weight:900;color:var(--primary);line-height:1;}
+.hero-stat-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;}
+.scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:12px;animation:float 2.5s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(6px);}}
+.scroll-hint::after{content:'';width:1px;height:28px;background:linear-gradient(var(--primary),transparent);}
+
+/* ── SECTION SHELL ── */
+section{padding:80px 32px;}
+.section-inner{max-width:1200px;margin:0 auto;}
+.section-label{font-size:12px;font-weight:700;color:var(--primary);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;}
+.section-title{font-size:clamp(28px,4vw,42px);font-weight:800;color:var(--white);margin-bottom:12px;line-height:1.2;}
+.section-sub{font-size:16px;color:var(--muted2);max-width:560px;margin-bottom:48px;}
+
+/* ── LIVE NEWS ── */
+#news{background:var(--bg);}
+.news-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px;}
+.news-header-left{}
+.news-meta{font-size:13px;color:var(--muted);margin-top:4px;}
+.news-meta span{color:var(--primary);}
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;}
+
+/* Story card */
+.story-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:10px;transition:.2s;text-decoration:none;color:inherit;}
+.story-card:hover{border-color:var(--primary-dim);box-shadow:0 4px 24px rgba(0,180,216,.12);transform:translateY(-2px);}
+.story-card.uplifted{border-color:var(--uplift);background:rgba(251,191,36,.04);}
+.story-card.blindspot{border-left:3px solid #ef4444;}
+.card-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.04em;}
+.badge-uplifted{background:rgba(251,191,36,.2);color:var(--uplift);}
+.badge-blindspot{background:rgba(239,68,68,.15);color:#fca5a5;}
+.badge-multi{background:rgba(0,180,216,.15);color:var(--primary);}
+.badge-civic{background:rgba(16,185,129,.15);color:#6ee7b7;}
+.card-title{font-size:15px;font-weight:600;line-height:1.45;color:var(--white);}
+.diversity-bar{height:4px;border-radius:3px;display:flex;overflow:hidden;gap:1px;}
+.div-seg{height:100%;border-radius:2px;}
+.source-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.type-pill{display:inline-block;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:600;}
+.type-national{background:rgba(59,130,246,.2);color:#93c5fd;}
+.type-government{background:rgba(16,185,129,.2);color:#6ee7b7;}
+.type-local{background:rgba(245,158,11,.2);color:#fcd34d;}
+.type-nonprofit{background:rgba(139,92,246,.2);color:#c4b5fd;}
+.card-age{font-size:11px;color:var(--muted);margin-left:auto;}
+.news-more{text-align:center;margin-top:32px;}
+
+/* ── TICKER BANNER ── */
+#ticker-banner{background:linear-gradient(90deg,rgba(0,180,216,.12),rgba(0,144,170,.08));border-top:1px solid rgba(0,180,216,.2);border-bottom:1px solid rgba(0,180,216,.2);padding:10px 0;overflow:hidden;position:relative;}
+.ticker-track{display:flex;white-space:nowrap;animation:ticker-scroll 60s linear infinite;}
+.ticker-track:hover{animation-play-state:paused;}
+.ticker-item-span{display:inline-block;padding:0 40px;font-size:13px;color:var(--muted2);}
+.ticker-item-span b{color:var(--primary);margin-right:8px;}
+.ticker-sep{color:var(--border2);margin:0 8px;}
+
+/* ── MISSION ── */
+#mission{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.mission-text p{font-size:17px;color:var(--muted2);line-height:1.8;margin-bottom:16px;}
+.mission-text p:last-child{margin-bottom:0;}
+.mission-pillars{display:flex;flex-direction:column;gap:16px;}
+.pillar{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;display:flex;gap:16px;align-items:flex-start;}
+.pillar-icon{font-size:24px;flex-shrink:0;margin-top:2px;}
+.pillar h3{font-size:15px;font-weight:700;color:var(--white);margin-bottom:4px;}
+.pillar p{font-size:13px;color:var(--muted2);line-height:1.5;}
+
+/* ── TOOLS ── */
+#tools{background:var(--bg);}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
+.tool-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:flex;flex-direction:column;gap:12px;transition:.2s;}
+.tool-card:hover{border-color:var(--primary-dim);box-shadow:0 4px 24px var(--primary-glow);}
+.tool-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(0,180,216,.12);border:1px solid rgba(0,180,216,.25);}
+.tool-card h3{font-size:17px;font-weight:700;color:var(--white);}
+.tool-card p{font-size:14px;color:var(--muted2);line-height:1.6;flex:1;}
+.tool-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--primary);text-decoration:none;margin-top:4px;}
+.tool-link:hover{color:var(--accent);}
+.tool-link::after{content:'→';}
+
+/* ── FOOTER ── */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:40px 32px;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.footer-logo{font-size:14px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.05em;}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap;}
+.footer-links a{font-size:13px;color:var(--muted);text-decoration:none;transition:.15s;}
+.footer-links a:hover{color:var(--primary);}
+.footer-copy{font-size:12px;color:var(--muted);margin-top:4px;}
+
+/* ── LOADING SKELETON ── */
+.skeleton{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  nav{padding:0 20px;}
+  .nav-links{gap:0;}
+  .nav-links a:not(.nav-cta){display:none;}
+  section{padding:60px 20px;}
+  .mission-grid{grid-template-columns:1fr;gap:36px;}
+  .hero-stats{gap:24px;}
+  .hero-stat-num{font-size:24px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/">
+    <span class="live-dot"></span>
+    <span class="nav-wordmark">Civic Resilience Network</span>
+  </a>
+  <div class="nav-links">
+    <a href="#news">News</a>
+    <a href="#mission">Mission</a>
+    <a href="#tools">Tools</a>
+    <a href="https://api.civicresilience.net/news" target="_blank" class="nav-cta">Full News Feed →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><span class="live-dot"></span> Live News Intelligence</div>
+    <h1 class="hero-title">Community news that <span>matters most</span></h1>
+    <p class="hero-sub">Real-time civic news intelligence — tracking local government, emergency alerts, and community stories across Iowa and the nation.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#news">View Live Feed</a>
+      <a class="btn btn-ghost" href="#mission">Our Mission</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num" id="stat-sources">15</div><div class="hero-stat-label">News Sources</div></div>
+      <div class="hero-stat"><div class="hero-stat-num" id="stat-stories">—</div><div class="hero-stat-label">Stories Today</div></div>
+      <div class="hero-stat"><div class="hero-stat-num" id="stat-local">—</div><div class="hero-stat-label">Local Stories</div></div>
+      <div class="hero-stat"><div class="hero-stat-num" id="stat-uplifted">—</div><div class="hero-stat-label">Uplifted</div></div>
+    </div>
+  </div>
+  <div class="scroll-hint">scroll</div>
+</section>
+
+<!-- TICKER -->
+<div id="ticker-banner" style="display:none;">
+  <div class="ticker-track" id="ticker-track"></div>
+</div>
+
+<!-- LIVE NEWS -->
+<section id="news">
+  <div class="section-inner">
+    <div class="news-header">
+      <div class="news-header-left">
+        <div class="section-label">Live Intelligence Feed</div>
+        <h2 class="section-title" style="margin-bottom:0;">What's happening now</h2>
+        <div class="news-meta">Updated <span id="news-age">—</span> · Auto-refreshes every 5 minutes</div>
+      </div>
+    </div>
+    <div class="news-grid" id="news-grid">
+      <!-- skeleton cards -->
+      <div class="story-card"><div class="skeleton" style="height:14px;width:60%;"></div><div class="skeleton" style="height:40px;margin-top:8px;"></div><div class="skeleton" style="height:4px;margin-top:8px;"></div></div>
+      <div class="story-card"><div class="skeleton" style="height:14px;width:60%;"></div><div class="skeleton" style="height:40px;margin-top:8px;"></div><div class="skeleton" style="height:4px;margin-top:8px;"></div></div>
+      <div class="story-card"><div class="skeleton" style="height:14px;width:60%;"></div><div class="skeleton" style="height:40px;margin-top:8px;"></div><div class="skeleton" style="height:4px;margin-top:8px;"></div></div>
+    </div>
+    <div class="news-more">
+      <a class="btn btn-ghost" href="https://api.civicresilience.net/news" target="_blank">Full News Intelligence Dashboard →</a>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section id="mission">
+  <div class="section-inner">
+    <div class="mission-grid">
+      <div class="mission-text">
+        <div class="section-label">Our Mission</div>
+        <h2 class="section-title">Built for civic journalists and community advocates</h2>
+        <p>Civic Resilience Network aggregates news from national outlets, government agencies, and local Iowa sources — surfacing the stories that matter most to communities, often before they trend.</p>
+        <p>We track emergency alerts, local government decisions, housing policy, public health, and civic engagement stories — then make them accessible for community broadcasters and local newsrooms.</p>
+        <a class="btn btn-ghost" href="#tools" style="margin-top:8px;display:inline-flex;">See the tools →</a>
+      </div>
+      <div class="mission-pillars">
+        <div class="pillar">
+          <div class="pillar-icon">📡</div>
+          <div>
+            <h3>Multi-Source Coverage</h3>
+            <p>Stories tracked across 15+ sources. When multiple outlets cover the same story, we show you who and highlight what's being missed.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">🔦</div>
+          <div>
+            <h3>Blindspot Detection</h3>
+            <p>Stories covered by only one source type get flagged. These are often the most important local stories flying under the radar.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">⬆</div>
+          <div>
+            <h3>Community Uplift</h3>
+            <p>Editors can uplift stories that deserve more community attention — instantly pushing them to live OBS broadcasts and the top of the feed.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">📺</div>
+          <div>
+            <h3>Live Broadcast Ready</h3>
+            <p>Integrated with OBS Studio. Lower thirds, news tickers, and scene overlays update in real time from any browser.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section id="tools">
+  <div class="section-inner">
+    <div class="section-label">Platform Tools</div>
+    <h2 class="section-title">Everything in one place</h2>
+    <p class="section-sub">From raw news intelligence to live on-air broadcasts — the full civic journalism toolkit.</p>
+    <div class="tools-grid">
+      <div class="tool-card">
+        <div class="tool-icon">📰</div>
+        <h3>News Intelligence Feed</h3>
+        <p>Full Ground.news-style dashboard — story clusters, source diversity bars, blindspot flags, civic scoring, and uplift controls.</p>
+        <a class="tool-link" href="https://api.civicresilience.net/news" target="_blank">Open News Feed</a>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon">📺</div>
+        <h3>OBS Overlay Control</h3>
+        <p>Live lower-third speaker cards, breaking news ticker, scene management. Control everything from one panel while on air.</p>
+        <a class="tool-link" href="https://api.civicresilience.net/control" target="_blank">Open OBS Control</a>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon">🗂</div>
+        <h3>Document Archive Search</h3>
+        <p>Semantic vector search across the civic document archive — PDFs, government reports, policy documents, and community records.</p>
+        <a class="tool-link" href="https://api.civicresilience.net/health" target="_blank">API Status</a>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon">🤖</div>
+        <h3>AI Summarisation</h3>
+        <p>Generate plain-language summaries of government documents and civic reports using local AI — no data leaves the cluster.</p>
+        <a class="tool-link" href="https://api.civicresilience.net/docs" target="_blank">API Docs</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Civic Resilience Network</div>
+      <div class="footer-copy">© 2026 civicresilience.net · Iowa, USA</div>
+    </div>
+    <div class="footer-links">
+      <a href="#news">News Feed</a>
+      <a href="#mission">Mission</a>
+      <a href="https://api.civicresilience.net/news" target="_blank">Full Dashboard</a>
+      <a href="https://api.civicresilience.net/control" target="_blank">OBS Control</a>
+      <a href="https://api.civicresilience.net/health" target="_blank">API Status</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const API = 'https://api.civicresilience.net';
+const TYPE_COLOR = {national:'#3b82f6',government:'#10b981',local:'#f59e0b',nonprofit:'#8b5cf6'};
+
+// ── Hero particle canvas ──────────────────────────────────────────────────────
+(function(){
+  const c = document.getElementById('hero-canvas');
+  const ctx = c.getContext('2d');
+  function resize(){ c.width = window.innerWidth; c.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const N = 60, P = [0,180,216];
+  const pts = Array.from({length:N}, () => ({
+    x:Math.random()*c.width, y:Math.random()*c.height,
+    vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4,
+    r:1+Math.random()*2, a:.3+Math.random()*.5, p:Math.random()*Math.PI*2
+  }));
+  function draw(ts){
+    ctx.clearRect(0,0,c.width,c.height);
+    // Gradient bg
+    const g = ctx.createRadialGradient(c.width/2,c.height/2,0,c.width/2,c.height/2,c.width*.8);
+    g.addColorStop(0,'#0d2137'); g.addColorStop(.6,'#091929'); g.addColorStop(1,'#040d14');
+    ctx.fillStyle=g; ctx.fillRect(0,0,c.width,c.height);
+    // Links
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<160){ ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(${P},${(1-d/160)*.15})`; ctx.lineWidth=.6; ctx.stroke(); }
+    }
+    // Dots
+    pts.forEach(p => {
+      p.p+=.015; const a=p.a*(.6+.4*Math.sin(p.p));
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${P},${a})`; ctx.fill();
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=c.width; if(p.x>c.width)p.x=0;
+      if(p.y<0)p.y=c.height; if(p.y>c.height)p.y=0;
+    });
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// ── News feed ─────────────────────────────────────────────────────────────────
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function divBar(typeCount, total){
+  return Object.entries(typeCount).map(([t,n]) =>
+    `<div class="div-seg" style="background:${TYPE_COLOR[t]||'#888'};flex:${n}" title="${t}"></div>`
+  ).join('');
+}
+
+function storyCard(s){
+  const badges = [];
+  if(s.uplifted) badges.push('<span class="badge badge-uplifted">⬆ UPLIFTED</span>');
+  else if(s.is_blindspot) badges.push('<span class="badge badge-blindspot">BLINDSPOT</span>');
+  if(s.coverage_count > 1) badges.push(`<span class="badge badge-multi">${s.coverage_count} sources</span>`);
+  if(s.civic_score >= 3) badges.push(`<span class="badge badge-civic">CIVIC ★${s.civic_score}</span>`);
+
+  const pills = [...new Set(s.source_types)].map(t =>
+    `<span class="type-pill type-${t}">${t}</span>`
+  ).join('');
+
+  const age = s.age_minutes < 60
+    ? `${s.age_minutes}m ago`
+    : `${Math.round(s.age_minutes/60)}h ago`;
+
+  const url = s.urls?.[0] || '#';
+  const cls = s.uplifted ? ' uplifted' : s.is_blindspot ? ' blindspot' : '';
+
+  return `<a class="story-card${cls}" href="${esc(url)}" target="_blank" rel="noopener">
+    ${badges.length ? `<div class="card-badges">${badges.join('')}</div>` : ''}
+    <div class="card-title">${esc(s.title)}</div>
+    <div class="diversity-bar">${divBar(s.type_counts||{},s.coverage_count)}</div>
+    <div class="source-row">${pills}<span class="card-age">${age}</span></div>
+  </a>`;
+}
+
+async function loadNews(){
+  try {
+    const r = await fetch(`${API}/news/feed?limit=9`);
+    if(!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    const stories = d.stories || [];
+    const stats = d.stats || {};
+
+    // Update hero stats
+    if(stats.total) document.getElementById('stat-stories').textContent = stats.total;
+    if(stats.by_type?.local) document.getElementById('stat-local').textContent = stats.by_type.local;
+    if(stats.uplifted !== undefined) document.getElementById('stat-uplifted').textContent = stats.uplifted;
+
+    // Refresh age
+    if(stats.last_refresh){
+      const mins = Math.round((Date.now() - new Date(stats.last_refresh)) / 60000);
+      document.getElementById('news-age').textContent = mins < 1 ? 'just now' : `${mins} min ago`;
+    }
+
+    // Render cards — uplifted first, then high civic score, then multi-source
+    document.getElementById('news-grid').innerHTML = stories.length
+      ? stories.slice(0,9).map(storyCard).join('')
+      : '<p style="color:var(--muted);grid-column:1/-1">No stories loaded yet — feed refreshes every 30 minutes.</p>';
+
+    // Ticker banner
+    if(stories.length){
+      const items = stories.slice(0,12).map(s =>
+        `<span class="ticker-item-span"><b>${s.uplifted?'⬆ UPLIFTED':s.coverage_count>1?`${s.coverage_count} SOURCES`:'NEWS'}</b>${esc(s.title)}</span><span class="ticker-sep">◆</span>`
+      ).join('');
+      document.getElementById('ticker-track').innerHTML = items + items; // double for seamless loop
+      document.getElementById('ticker-banner').style.display = '';
+    }
+  } catch(e) {
+    document.getElementById('news-grid').innerHTML =
+      '<p style="color:var(--muted);grid-column:1/-1">Connecting to news feed…</p>';
+  }
+}
+
+loadNews();
+setInterval(loadNews, 5 * 60 * 1000);
+</script>
+</body>
+</html>

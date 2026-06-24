@@ -45,6 +45,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ── Homepage ─────────────────────────────────────────────────────────────────
+@app.get("/", response_class=HTMLResponse)
+async def homepage():
+    p = Path(__file__).parent / "index.html"
+    if not p.exists():
+        raise HTTPException(404, "index.html not found")
+    return p.read_text()
+
 # ── Health ───────────────────────────────────────────────────────────────────
 @app.get("/health")
 async def health():
