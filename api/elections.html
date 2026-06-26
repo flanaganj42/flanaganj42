@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Civic Resilience Network — Election roles, duties, and volunteer opportunities by state. Help run democracy at the precinct level.">
+<title>Elections — Civic Resilience Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#050f1c;--bg2:#0c1f35;--bg3:#0f2540;
+  --border:#1a3a5c;--border2:#1e4a70;
+  --primary:#00b4d8;--primary-dim:#0090aa;--primary-glow:rgba(0,180,216,0.25);
+  --accent:#48cae4;
+  --green:#10b981;--amber:#f59e0b;--red:#ef4444;--purple:#8b5cf6;
+  --text:#e2e8f0;--muted:#64748b;--muted2:#8da8c4;--white:#fff;
+  --radius:12px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6;overflow-x:hidden;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 32px;height:60px;display:flex;align-items:center;background:rgba(5,15,28,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(26,58,92,0.6);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 10px #ef4444;animation:blink 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.nav-wordmark{font-size:15px;font-weight:700;color:var(--primary);letter-spacing:.05em;text-transform:uppercase;}
+.nav-links{display:flex;gap:4px;margin-left:auto;align-items:center;}
+.nav-links a{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--muted2);text-decoration:none;transition:.15s;}
+.nav-links a:hover{color:var(--white);background:rgba(255,255,255,.06);}
+.nav-links a.active{color:var(--primary);}
+.nav-cta{background:var(--primary)!important;color:#000!important;font-weight:700!important;}
+.nav-cta:hover{background:var(--primary-dim)!important;}
+
+/* HERO */
+#hero{padding:100px 32px 60px;text-align:center;background:linear-gradient(180deg,rgba(0,180,216,.06) 0%,transparent 100%);border-bottom:1px solid var(--border);}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;border:1px solid rgba(0,180,216,.35);background:rgba(0,180,216,.08);font-size:12px;font-weight:600;color:var(--primary);letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px;}
+.hero-title{font-size:clamp(32px,5vw,60px);font-weight:900;line-height:1.1;color:var(--white);letter-spacing:-.02em;margin-bottom:16px;}
+.hero-title span{color:var(--primary);}
+.hero-sub{font-size:clamp(15px,2vw,18px);color:var(--muted2);max-width:620px;margin:0 auto 32px;}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;transition:.2s;border:none;cursor:pointer;}
+.btn-primary{background:var(--primary);color:#000;}
+.btn-primary:hover{background:var(--primary-dim);transform:translateY(-1px);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text);}
+.btn-ghost:hover{border-color:var(--primary);color:var(--primary);}
+
+/* SECTION */
+section{padding:72px 32px;max-width:1200px;margin:0 auto;}
+.section-label{font-size:11px;font-weight:700;color:var(--primary);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px;}
+.section-title{font-size:clamp(24px,3vw,36px);font-weight:800;color:var(--white);margin-bottom:12px;}
+.section-sub{font-size:15px;color:var(--muted2);max-width:640px;margin-bottom:40px;}
+
+/* ELECTION PROCESS TIMELINE */
+.timeline{display:flex;gap:0;overflow-x:auto;padding-bottom:8px;}
+.timeline-step{flex:1;min-width:160px;position:relative;padding:24px 20px 20px;}
+.timeline-step::before{content:'';position:absolute;top:36px;left:0;right:0;height:2px;background:var(--border2);}
+.timeline-step:first-child::before{left:50%;}
+.timeline-step:last-child::before{right:50%;}
+.step-dot{width:14px;height:14px;border-radius:50%;background:var(--primary);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--primary);position:relative;z-index:1;margin:0 auto 16px;}
+.step-num{font-size:10px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.1em;text-align:center;margin-bottom:6px;}
+.step-title{font-size:13px;font-weight:700;color:var(--white);text-align:center;margin-bottom:6px;}
+.step-who{font-size:11px;color:var(--muted2);text-align:center;line-height:1.5;}
+
+/* ROLES GRID */
+.roles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;}
+.role-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:.2s;}
+.role-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.role-icon{font-size:28px;margin-bottom:12px;}
+.role-name{font-size:16px;font-weight:700;color:var(--white);margin-bottom:4px;}
+.role-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
+.tag-paid{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3);}
+.tag-volunteer{background:rgba(0,180,216,.12);color:var(--primary);border:1px solid rgba(0,180,216,.25);}
+.tag-elected{background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.3);}
+.tag-party{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.25);}
+.role-desc{font-size:13px;color:var(--muted2);margin-bottom:16px;line-height:1.6;}
+.role-duties{list-style:none;margin-bottom:16px;}
+.role-duties li{font-size:12px;color:var(--muted2);padding:3px 0 3px 16px;position:relative;}
+.role-duties li::before{content:'›';position:absolute;left:0;color:var(--primary);}
+.role-meta{display:flex;gap:16px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:14px;margin-top:auto;}
+.meta-item{font-size:11px;color:var(--muted);}
+.meta-item strong{color:var(--muted2);display:block;}
+
+/* STATE SECTION */
+.state-tool{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.state-tool-header{padding:24px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.state-select-wrap{position:relative;flex:1;min-width:220px;}
+.state-select{width:100%;padding:10px 36px 10px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;appearance:none;cursor:pointer;}
+.state-select:focus{outline:none;border-color:var(--primary);}
+.state-select-wrap::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+.state-search{padding:10px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;min-width:200px;}
+.state-search::placeholder{color:var(--muted);}
+.state-search:focus{outline:none;border-color:var(--primary);}
+.state-panel{padding:28px;display:none;}
+.state-panel.active{display:block;}
+.state-name-header{font-size:22px;font-weight:800;color:var(--white);margin-bottom:4px;}
+.state-sos{font-size:13px;color:var(--muted2);margin-bottom:24px;}
+.state-sos a{color:var(--primary);text-decoration:none;}
+.state-sos a:hover{text-decoration:underline;}
+.state-cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.state-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.state-card-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.state-card-title .icon{font-size:16px;}
+.state-card p{font-size:12px;color:var(--muted2);line-height:1.6;margin-bottom:10px;}
+.state-card a{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--primary);text-decoration:none;padding:6px 12px;border:1px solid rgba(0,180,216,.3);border-radius:6px;transition:.15s;}
+.state-card a:hover{background:rgba(0,180,216,.1);}
+.county-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:8px;}
+.county-item{font-size:12px;color:var(--muted2);padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;display:flex;justify-content:space-between;align-items:center;}
+.county-item a{color:var(--primary);text-decoration:none;font-size:11px;}
+
+/* IOWA SPOTLIGHT */
+.iowa-spotlight{background:linear-gradient(135deg,rgba(0,180,216,.08),rgba(16,185,129,.05));border:1px solid rgba(0,180,216,.25);border-radius:var(--radius);padding:28px;margin-bottom:28px;}
+.iowa-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;background:rgba(0,180,216,.15);border:1px solid rgba(0,180,216,.3);font-size:11px;font-weight:700;color:var(--primary);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
+.iowa-stats{display:flex;gap:32px;flex-wrap:wrap;margin-top:16px;}
+.iowa-stat{text-align:center;}
+.iowa-stat-num{font-size:24px;font-weight:900;color:var(--primary);}
+.iowa-stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+
+/* QUICK LINKS */
+.quicklinks{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:40px;}
+.quicklink{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-decoration:none;color:var(--text);transition:.2s;display:flex;gap:14px;align-items:flex-start;}
+.quicklink:hover{border-color:var(--primary);transform:translateY(-2px);}
+.quicklink-icon{font-size:24px;flex-shrink:0;}
+.quicklink-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:4px;}
+.quicklink-desc{font-size:12px;color:var(--muted2);}
+
+/* PLACEHOLDER */
+.state-placeholder{text-align:center;padding:48px 24px;color:var(--muted);}
+.state-placeholder .big{font-size:48px;margin-bottom:12px;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:32px;text-align:center;color:var(--muted);font-size:13px;}
+footer a{color:var(--primary);text-decoration:none;}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  nav{padding:0 16px;}
+  section{padding:48px 16px;}
+  .timeline{flex-direction:column;}
+  .timeline-step::before{display:none;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <span class="live-dot"></span>
+    <span class="nav-wordmark">Civic Resilience</span>
+  </a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/news">News</a>
+    <a href="/elections" class="active">Elections</a>
+    <a href="/control" class="nav-cta">Control</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div id="hero">
+  <div class="hero-eyebrow">🗳️ Election Transparency</div>
+  <h1 class="hero-title">How Democracy<br><span>Gets Done</span></h1>
+  <p class="hero-sub">Elections don't run themselves. Thousands of citizens fill critical roles at every level — from your precinct to the Secretary of State. Find your role and get involved.</p>
+  <div class="hero-actions">
+    <a href="#volunteer" class="btn btn-primary">Find Volunteer Opportunities</a>
+    <a href="#roles" class="btn btn-ghost">See All Roles</a>
+  </div>
+</div>
+
+<!-- ELECTION PROCESS TIMELINE -->
+<section id="process">
+  <div class="section-label">How It Works</div>
+  <h2 class="section-title">The Election Process</h2>
+  <p class="section-sub">From candidate filing to certified results — who is responsible at each stage.</p>
+
+  <div class="timeline">
+    <div class="timeline-step">
+      <div class="step-dot"></div>
+      <div class="step-num">Stage 1</div>
+      <div class="step-title">Candidate Filing</div>
+      <div class="step-who">Secretary of State · County Auditor · Party Committees</div>
+    </div>
+    <div class="timeline-step">
+      <div class="step-dot"></div>
+      <div class="step-num">Stage 2</div>
+      <div class="step-title">Voter Registration</div>
+      <div class="step-who">County Auditor · DMV · Volunteer Registrars · Online Portal</div>
+    </div>
+    <div class="timeline-step">
+      <div class="step-dot"></div>
+      <div class="step-num">Stage 3</div>
+      <div class="step-title">Absentee Ballots</div>
+      <div class="step-who">County Auditor · Absentee Processing Teams · USPS</div>
+    </div>
+    <div class="timeline-step">
+      <div class="step-dot"></div>
+      <div class="step-num">Stage 4</div>
+      <div class="step-title">Election Day</div>
+      <div class="step-who">Poll Workers · Election Judges · Precinct Chairs · Observers</div>
+    </div>
+    <div class="timeline-step">
+      <div class="step-dot"></div>
+      <div class="step-num">Stage 5</div>
+      <div class="step-title">Canvass & Count</div>
+      <div class="step-who">County Canvassing Board · Auditor · Party Representatives</div>
+    </div>
+    <div class="timeline-step">
+      <div class="step-dot"></div>
+      <div class="step-num">Stage 6</div>
+      <div class="step-title">Certification</div>
+      <div class="step-who">State Canvassing Board · Secretary of State · Governor</div>
+    </div>
+  </div>
+</section>
+
+<!-- ROLES -->
+<section id="roles" style="background:var(--bg2);max-width:none;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+<div style="max-width:1200px;margin:0 auto;">
+  <div class="section-label">Who Does the Work</div>
+  <h2 class="section-title">Election Roles & Duties</h2>
+  <p class="section-sub">Every role below is filled by citizens — most are paid, all are essential.</p>
+
+  <div class="roles-grid">
+
+    <div class="role-card">
+      <div class="role-icon">🗳️</div>
+      <div class="role-name">Poll Worker</div>
+      <span class="role-tag tag-paid">Paid</span>
+      <p class="role-desc">The frontline of democracy. Poll workers staff voting locations on Election Day, check in voters, distribute ballots, and ensure the polling place runs smoothly and lawfully.</p>
+      <ul class="role-duties">
+        <li>Set up and close polling location</li>
+        <li>Verify voter registrations and issue ballots</li>
+        <li>Assist voters with accessibility needs</li>
+        <li>Operate voting equipment</li>
+        <li>Secure and transmit results at close</li>
+      </ul>
+      <div class="role-meta">
+        <div class="meta-item"><strong>Pay</strong>$100–$200/day</div>
+        <div class="meta-item"><strong>Time</strong>12–14 hrs Election Day + training</div>
+        <div class="meta-item"><strong>Who</strong>Must be registered voter in most states</div>
+      </div>
+    </div>
+
+    <div class="role-card">
+      <div class="role-icon">⚖️</div>
+      <div class="role-name">Election Judge / Inspector</div>
+      <span class="role-tag tag-paid">Paid</span>
+      <p class="role-desc">Election judges oversee polling places and resolve disputes. Many states require bipartisan pairs — one from each major party — to serve together, ensuring accountability.</p>
+      <ul class="role-duties">
+        <li>Supervise poll workers at the precinct</li>
+        <li>Rule on challenged ballots and voter eligibility</li>
+        <li>Enforce electioneering laws within the polling place</li>
+        <li>Certify precinct results at close of polls</li>
+      </ul>
+      <div class="role-meta">
+        <div class="meta-item"><strong>Pay</strong>$150–$300/day</div>
+        <div class="meta-item"><strong>Time</strong>Election Day + 2–4 hr training</div>
+        <div class="meta-item"><strong>Who</strong>Appointed by county auditor or party</div>
+      </div>
+    </div>
+
+    <div class="role-card">
+      <div class="role-icon">🏘️</div>
+      <div class="role-name">Precinct Captain / Chair</div>
+      <span class="role-tag tag-elected">Party Elected</span>
+      <p class="role-desc">The grassroots anchor of political organizing. Precinct captains know their neighborhood, mobilize voters, and serve as the link between residents and the party or campaign.</p>
+      <ul class="role-duties">
+        <li>Know every registered voter in your precinct</li>
+        <li>Organize door-knocking and phone banking</li>
+        <li>Coordinate voter registration drives</li>
+        <li>Run the party caucus or precinct meeting</li>
+        <li>Report results to county party leadership</li>
+      </ul>
+      <div class="role-meta">
+        <div class="meta-item"><strong>Pay</strong>Volunteer</div>
+        <div class="meta-item"><strong>Time</strong>Year-round, 2–10 hrs/week peak</div>
+        <div class="meta-item"><strong>Who</strong>Any party member in the precinct</div>
+      </div>
+    </div>
+
+    <div class="role-card">
+      <div class="role-icon">👁️</div>
+      <div class="role-name">Party Observer / Watcher</div>
+      <span class="role-tag tag-party">Party Role</span>
+      <p class="role-desc">Observers represent a party or candidate inside the polling place and canvassing board. They watch the process without interfering — a critical transparency function.</p>
+      <ul class="role-duties">
+        <li>Observe voter check-in and ballot issuance</li>
+        <li>Watch absentee ballot processing</li>
+        <li>Observe the canvass and vote count</li>
+        <li>Challenge irregularities through official channels</li>
+        <li>Report observations to party leadership</li>
+      </ul>
+      <div class="role-meta">
+        <div class="meta-item"><strong>Pay</strong>Volunteer (campaigns sometimes pay)</div>
+        <div class="meta-item"><strong>Time</strong>Election Day, canvass board sessions</div>
+        <div class="meta-item"><strong>Who</strong>Credentialed by party or candidate</div>
+      </div>
+    </div>
+
+    <div class="role-card">
+      <div class="role-icon">📋</div>
+      <div class="role-name">Voter Registration Volunteer</div>
+      <span class="role-tag tag-volunteer">Volunteer</span>
+      <p class="role-desc">Drives registration at community events, schools, libraries, and door-to-door. The earlier voters are registered, the smoother Election Day runs. Nonpartisan and party-based opportunities exist.</p>
+      <ul class="role-duties">
+        <li>Table at community events and markets</li>
+        <li>Assist new citizens and first-time voters</li>
+        <li>Verify and submit registration forms</li>
+        <li>Track and follow up on pending registrations</li>
+      </ul>
+      <div class="role-meta">
+        <div class="meta-item"><strong>Pay</strong>Volunteer</div>
+        <div class="meta-item"><strong>Time</strong>Flexible, event-based</div>
+        <div class="meta-item"><strong>Who</strong>Anyone 16+ in most states</div>
+      </div>
+    </div>
+
+    <div class="role-card">
+      <div class="role-icon">📬</div>
+      <div class="role-name">Absentee Ballot Processor</div>
+      <span class="role-tag tag-paid">Sometimes Paid</span>
+      <p class="role-desc">As mail voting expands, counties need additional staff to open, verify, and process absentee ballots — often weeks before Election Day. Bipartisan teams required in most states.</p>
+      <ul class="role-duties">
+        <li>Open and sort returned envelopes</li>
+        <li>Verify signatures against registration records</li>
+        <li>Cure deficient ballots by contacting voters</li>
+        <li>Feed ballots into tabulators on or after Election Day</li>
+      </ul>
+      <div class="role-meta">
+        <div class="meta-item"><strong>Pay</strong>$15–$25/hr (county-dependent)</div>
+        <div class="meta-item"><strong>Time</strong>2–6 weeks before election</div>
+        <div class="meta-item"><strong>Who</strong>Hired by county auditor</div>
+      </div>
+    </div>
+
+    <div class="role-card">
+      <div class="role-icon">🚗</div>
+      <div class="role-name">GOTV Volunteer</div>
+      <span class="role-tag tag-volunteer">Volunteer</span>
+      <p class="role-desc">Get Out The Vote volunteers contact identified supporters in the final days before the election, reminding them to vote and offering rides, childcare coordination, or absentee ballot help.</p>
+      <ul class="role-duties">
+        <li>Phone bank and text bank from voter lists</li>
+        <li>Door-knock on Election Day (lit drop / knock & drag)</li>
+        <li>Drive voters to polls who lack transportation</li>
+        <li>Staff early voting and polling location drop-offs</li>
+      </ul>
+      <div class="role-meta">
+        <div class="meta-item"><strong>Pay</strong>Volunteer</div>
+        <div class="meta-item"><strong>Time</strong>Final 2 weeks + Election Day</div>
+        <div class="meta-item"><strong>Who</strong>Anyone</div>
+      </div>
+    </div>
+
+    <div class="role-card">
+      <div class="role-icon">🏛️</div>
+      <div class="role-name">County Canvassing Board Member</div>
+      <span class="role-tag tag-elected">Appointed / Elected</span>
+      <p class="role-desc">The canvassing board officially certifies election results at the county level. Members review provisional and challenged ballots, reconcile totals, and sign off on the official count.</p>
+      <ul class="role-duties">
+        <li>Convene within days of election to canvass results</li>
+        <li>Adjudicate provisional and challenged ballots</li>
+        <li>Reconcile vote totals with ballots cast</li>
+        <li>Sign and certify the abstract of votes</li>
+      </ul>
+      <div class="role-meta">
+        <div class="meta-item"><strong>Pay</strong>Stipend varies by county</div>
+        <div class="meta-item"><strong>Time</strong>Canvass period (1–2 weeks post-election)</div>
+        <div class="meta-item"><strong>Who</strong>Board of supervisors or appointed</div>
+      </div>
+    </div>
+
+    <div class="role-card">
+      <div class="role-icon">🔍</div>
+      <div class="role-name">Nonpartisan Election Observer</div>
+      <span class="role-tag tag-volunteer">Volunteer</span>
+      <p class="role-desc">Organizations like the League of Women Voters deploy nonpartisan observers to monitor elections for procedural compliance — not for any party, but for the integrity of the process itself.</p>
+      <ul class="role-duties">
+        <li>Observe polling place procedures without interfering</li>
+        <li>Document wait times, accessibility issues, equipment problems</li>
+        <li>Report findings to observation organization</li>
+        <li>Testify or file reports if irregularities observed</li>
+      </ul>
+      <div class="role-meta">
+        <div class="meta-item"><strong>Pay</strong>Volunteer</div>
+        <div class="meta-item"><strong>Time</strong>Election Day shifts</div>
+        <div class="meta-item"><strong>Who</strong>Credentialed by civic organization</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- IOWA SPOTLIGHT -->
+<section id="iowa">
+  <div class="section-label">Iowa Featured</div>
+  <h2 class="section-title">Iowa Election Infrastructure</h2>
+  <p class="section-sub">Iowa's 99 counties each run their own elections under the supervision of the Iowa Secretary of State. The County Auditor is your primary contact for volunteering.</p>
+
+  <div class="iowa-spotlight">
+    <div class="iowa-badge">🌽 Iowa</div>
+    <p style="color:var(--muted2);font-size:14px;margin-bottom:4px;">Iowa administers elections through <strong style="color:var(--white)">99 County Auditors</strong> — one per county. They hire poll workers, manage voter rolls, process absentee ballots, and certify results to the State Canvassing Board.</p>
+    <div class="iowa-stats">
+      <div class="iowa-stat"><div class="iowa-stat-num">99</div><div class="iowa-stat-label">Counties</div></div>
+      <div class="iowa-stat"><div class="iowa-stat-num">1,682</div><div class="iowa-stat-label">Precincts</div></div>
+      <div class="iowa-stat"><div class="iowa-stat-num">~2.2M</div><div class="iowa-stat-label">Registered Voters</div></div>
+      <div class="iowa-stat"><div class="iowa-stat-num">$125</div><div class="iowa-stat-label">Typical Poll Worker Pay</div></div>
+    </div>
+  </div>
+
+  <div class="state-cols">
+    <div class="state-card">
+      <div class="state-card-title"><span class="icon">🏛️</span>Iowa Secretary of State</div>
+      <p>Oversees statewide election administration, certifies results, manages voter registration database, and trains county auditors.</p>
+      <a href="https://sos.iowa.gov/elections/pollingplace/workapollingplace.html" target="_blank" rel="noopener">Work a Polling Place →</a>
+    </div>
+    <div class="state-card">
+      <div class="state-card-title"><span class="icon">🗓️</span>Iowa Poll Worker Requirements</div>
+      <p>Must be a registered Iowa voter. Training provided by county. High school students 17+ may serve with county approval. Pay set by each county, typically $100–$150.</p>
+      <a href="https://sos.iowa.gov/elections/auditors/auditorslist.html" target="_blank" rel="noopener">Find Your County Auditor →</a>
+    </div>
+    <div class="state-card">
+      <div class="state-card-title"><span class="icon">📝</span>Iowa Voter Registration</div>
+      <p>Iowa allows same-day registration at the polls. Online registration available through the SOS website. Volunteer registration drives coordinated through county parties and civic orgs.</p>
+      <a href="https://mymvd.iowadot.gov/Account/Login" target="_blank" rel="noopener">Register Online →</a>
+    </div>
+    <div class="state-card">
+      <div class="state-card-title"><span class="icon">📬</span>Absentee Voting</div>
+      <p>Iowa allows no-excuse absentee voting. County auditors process returned ballots. Volunteer opportunities through county auditor offices and party canvassing operations.</p>
+      <a href="https://sos.iowa.gov/elections/absenteeinfo.html" target="_blank" rel="noopener">Absentee Info →</a>
+    </div>
+  </div>
+
+  <div style="margin-top:32px;">
+    <div class="section-label">Major Iowa Counties — Poll Worker Contacts</div>
+    <div class="county-grid" id="iowa-counties"></div>
+  </div>
+</section>
+
+<!-- VOLUNTEER BY STATE -->
+<section id="volunteer" style="background:var(--bg2);max-width:none;border-top:1px solid var(--border);">
+<div style="max-width:1200px;margin:0 auto;">
+  <div class="section-label">All 50 States</div>
+  <h2 class="section-title">Volunteer by State</h2>
+  <p class="section-sub">Select your state to find official poll worker signup links, pay rates, and requirements.</p>
+
+  <div class="state-tool">
+    <div class="state-tool-header">
+      <div class="state-select-wrap">
+        <select class="state-select" id="state-select" onchange="showState(this.value)">
+          <option value="">— Select a State —</option>
+        </select>
+      </div>
+      <input class="state-search" id="state-search" type="text" placeholder="Search state name..." oninput="filterStates(this.value)">
+    </div>
+    <div id="state-content">
+      <div class="state-placeholder">
+        <div class="big">🗳️</div>
+        <div>Select a state to see volunteer opportunities and poll worker info</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- QUICK LINKS -->
+<section id="resources">
+  <div class="section-label">National Resources</div>
+  <h2 class="section-title">Get Involved Nationally</h2>
+  <div class="quicklinks">
+    <a class="quicklink" href="https://www.eac.gov/voters/poll-worker-information" target="_blank" rel="noopener">
+      <span class="quicklink-icon">🇺🇸</span>
+      <div>
+        <div class="quicklink-title">U.S. Election Assistance Commission</div>
+        <div class="quicklink-desc">Federal poll worker recruitment and training resources</div>
+      </div>
+    </a>
+    <a class="quicklink" href="https://www.powerthepolls.org/" target="_blank" rel="noopener">
+      <span class="quicklink-icon">⚡</span>
+      <div>
+        <div class="quicklink-title">Power the Polls</div>
+        <div class="quicklink-desc">Nonpartisan poll worker recruitment — sign up in 2 minutes</div>
+      </div>
+    </a>
+    <a class="quicklink" href="https://www.lwv.org/leagues/find-your-local-league" target="_blank" rel="noopener">
+      <span class="quicklink-icon">🦅</span>
+      <div>
+        <div class="quicklink-title">League of Women Voters</div>
+        <div class="quicklink-desc">Local chapters run voter registration and election observation programs</div>
+      </div>
+    </a>
+    <a class="quicklink" href="https://vote.gov/register" target="_blank" rel="noopener">
+      <span class="quicklink-icon">✅</span>
+      <div>
+        <div class="quicklink-title">Vote.gov — Register to Vote</div>
+        <div class="quicklink-desc">Official U.S. government voter registration portal with all 50 states</div>
+      </div>
+    </a>
+    <a class="quicklink" href="https://www.nass.org/can-I-vote" target="_blank" rel="noopener">
+      <span class="quicklink-icon">🔎</span>
+      <div>
+        <div class="quicklink-title">Can I Vote? (NASS)</div>
+        <div class="quicklink-desc">Secretary of State tool for registration status, polling place, and ID requirements</div>
+      </div>
+    </a>
+    <a class="quicklink" href="https://www.nonprofitvote.org/" target="_blank" rel="noopener">
+      <span class="quicklink-icon">🤝</span>
+      <div>
+        <div class="quicklink-title">Nonprofit Vote</div>
+        <div class="quicklink-desc">Resources for nonprofits running nonpartisan voter engagement programs</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p>Civic Resilience Network · <a href="/">civicresilience.net</a> · <a href="/elections">Elections</a> · <a href="/news">News</a></p>
+  <p style="margin-top:8px;font-size:12px;">Information provided for civic education. Always verify current requirements with your county auditor or Secretary of State.</p>
+</footer>
+
+<script>
+// ── State data ────────────────────────────────────────────────────────────────
+const STATES = [
+  {code:"AL",name:"Alabama",sos:"https://www.sos.alabama.gov/alabama-votes/poll-workers",pay:"$75–$150/day",req:"Registered voter",note:"Applications through county probate judge"},
+  {code:"AK",name:"Alaska",sos:"https://elections.alaska.gov/Core/pollworker.php",pay:"$10–$16/hr",req:"Registered voter or US citizen 18+",note:"Students 16+ may serve"},
+  {code:"AZ",name:"Arizona",sos:"https://azsos.gov/elections/voters/poll-worker-information",pay:"$100–$175/day",req:"Registered AZ voter",note:"Bipartisan teams required"},
+  {code:"AR",name:"Arkansas",sos:"https://www.sos.arkansas.gov/elections/voter-information/poll-workers/",pay:"$50–$125/day",req:"Registered voter in county",note:"Apply through county clerk"},
+  {code:"CA",name:"California",sos:"https://www.sos.ca.gov/elections/polling-place/become-poll-worker",pay:"$150–$300/day",req:"Registered CA voter; students 16+ eligible",note:"High school students encouraged to apply"},
+  {code:"CO",name:"Colorado",sos:"https://www.sos.state.co.us/pubs/elections/VoterRegVolunteer.html",pay:"$150–$200/day",req:"Registered voter",note:"Vote centers; longer shifts available"},
+  {code:"CT",name:"Connecticut",sos:"https://portal.ct.gov/SOTS/Election-Services/Poll-Worker-Information/Poll-Worker-Information",pay:"$150–$300/day",req:"Registered voter in town",note:"Appointed by registrars of voters"},
+  {code:"DE",name:"Delaware",sos:"https://elections.delaware.gov/pollworker/index.shtml",pay:"$175–$225/day",req:"Registered DE voter",note:"Apply online through State Elections Commission"},
+  {code:"FL",name:"Florida",sos:"https://dos.fl.gov/elections/for-voters/voting/poll-workers/",pay:"$75–$200/day",req:"Registered voter in county",note:"Apply through Supervisor of Elections in your county"},
+  {code:"GA",name:"Georgia",sos:"https://sos.ga.gov/page/become-poll-worker",pay:"$150–$225/day",req:"Registered GA voter",note:"State recruits for all 159 counties"},
+  {code:"HI",name:"Hawaii",sos:"https://elections.hawaii.gov/voters/poll-workers/",pay:"$12–$16/hr",req:"Registered voter",note:"Hawaii is vote-by-mail; limited in-person sites"},
+  {code:"ID",name:"Idaho",sos:"https://sos.idaho.gov/elections-division/poll-workers/",pay:"$75–$150/day",req:"Registered voter in county",note:"Apply through county clerk"},
+  {code:"IL",name:"Illinois",sos:"https://www.elections.il.gov/ElectionInformation/VolunteerJudge.aspx",pay:"$125–$200/day",req:"Registered voter; students 17+ eligible",note:"Bipartisan pairs required"},
+  {code:"IN",name:"Indiana",sos:"https://www.in.gov/sos/elections/voter-information/pollworkers/",pay:"$100–$175/day",req:"Registered IN voter",note:"Apply through county circuit court clerk"},
+  {code:"IA",name:"Iowa",sos:"https://sos.iowa.gov/elections/pollingplace/workapollingplace.html",pay:"$100–$150/day",req:"Registered Iowa voter; students 17+ eligible",note:"Iowa Secretary of State runs centralized poll worker signup. Contact your County Auditor for local assignments."},
+  {code:"KS",name:"Kansas",sos:"https://sos.ks.gov/elections/elections_poll-workers.html",pay:"$75–$150/day",req:"Registered voter in county",note:"Apply through county election office"},
+  {code:"KY",name:"Kentucky",sos:"https://elect.ky.gov/Voters/Pages/BeAPollWorker.aspx",pay:"$100–$175/day",req:"Registered KY voter",note:"Apply through county clerk"},
+  {code:"LA",name:"Louisiana",sos:"https://www.sos.la.gov/ElectionsAndVoting/Vote/WorkAtPoll/Pages/default.aspx",pay:"$75–$150/day",req:"Registered voter in parish",note:"Apply through Parish Registrar of Voters"},
+  {code:"ME",name:"Maine",sos:"https://www.maine.gov/sos/cec/elec/clerk/officials.html",pay:"$100–$200/day",req:"Registered voter in municipality",note:"Apply through town or city clerk"},
+  {code:"MD",name:"Maryland",sos:"https://elections.maryland.gov/get_involved/poll_workers.html",pay:"$175–$275/day",req:"Registered voter or US citizen 17+",note:"Online application via State Board of Elections"},
+  {code:"MA",name:"Massachusetts",sos:"https://www.sec.state.ma.us/ele/elepollworker/pollworkeridx.htm",pay:"$150–$250/day",req:"Registered voter in city/town",note:"Apply through local election commission"},
+  {code:"MI",name:"Michigan",sos:"https://mvic.sos.state.mi.us/pollworker",pay:"$125–$200/day",req:"Registered MI voter; students 16+ eligible",note:"Apply online or through city/township clerk"},
+  {code:"MN",name:"Minnesota",sos:"https://www.sos.state.mn.us/elections-voting/election-jobs-volunteering/",pay:"$150–$250/day",req:"Registered voter or eligible; students 16+ eligible",note:"Apply through city or township clerk"},
+  {code:"MS",name:"Mississippi",sos:"https://www.sos.ms.gov/elections-voting/poll-workers",pay:"$60–$125/day",req:"Registered voter in county",note:"Apply through County Election Commission"},
+  {code:"MO",name:"Missouri",sos:"https://www.sos.mo.gov/elections/goVoteMissouri/becomePollWorker.asp",pay:"$100–$175/day",req:"Registered voter in county",note:"Apply through County Election Authority"},
+  {code:"MT",name:"Montana",sos:"https://sosmt.gov/elections/polls/pollworker/",pay:"$10–$15/hr",req:"Registered voter",note:"Apply through county election administrator"},
+  {code:"NE",name:"Nebraska",sos:"https://sos.nebraska.gov/elections/election-officials",pay:"$100–$175/day",req:"Registered voter in county",note:"Apply through county election commissioner or clerk"},
+  {code:"NV",name:"Nevada",sos:"https://www.nvsos.gov/sos/elections/voters/poll-workers",pay:"$150–$250/day",req:"Registered NV voter",note:"Apply through county clerk or registrar of voters"},
+  {code:"NH",name:"New Hampshire",sos:"https://www.sos.nh.gov/elections/polling-places/poll-workers",pay:"$100–$200/day",req:"Registered voter in town",note:"Apply through town or city clerk"},
+  {code:"NJ",name:"New Jersey",sos:"https://www.njelections.org/voter-information/election-judge.html",pay:"$200–$300/day",req:"Registered NJ voter",note:"Two-day commitment: training day + Election Day"},
+  {code:"NM",name:"New Mexico",sos:"https://www.sos.nm.gov/voting-and-elections/voter-information-portal/poll-worker/",pay:"$100–$175/day",req:"Registered voter in county",note:"Apply through County Clerk"},
+  {code:"NY",name:"New York",sos:"https://www.elections.ny.gov/pollworkers.html",pay:"$200–$375/day",req:"Registered voter; students 17+ eligible",note:"Bipartisan pairs; apply through county Board of Elections"},
+  {code:"NC",name:"North Carolina",sos:"https://www.ncsbe.gov/registering-vote/voting-place/become-poll-worker",pay:"$100–$200/day",req:"Registered voter in county",note:"Apply through County Board of Elections"},
+  {code:"ND",name:"North Dakota",sos:"https://vip.sos.nd.gov/PortalListDetails.aspx?ptlhPKID=51&ptlPKID=7",pay:"$10–$15/hr",req:"No registration required to vote in ND",note:"Apply through county auditor"},
+  {code:"OH",name:"Ohio",sos:"https://www.ohiosos.gov/elections/voters/poll-worker-information/",pay:"$150–$200/day",req:"Registered OH voter; students 17+ eligible",note:"Bipartisan pairs; apply through county Board of Elections"},
+  {code:"OK",name:"Oklahoma",sos:"https://oklahoma.gov/elections/voter-info/precinct-officials.html",pay:"$75–$150/day",req:"Registered voter in county",note:"Apply through County Election Board"},
+  {code:"OR",name:"Oregon",sos:"https://sos.oregon.gov/elections/Pages/work-election.aspx",pay:"$12–$18/hr",req:"Registered voter or US citizen 18+",note:"Oregon is all vote-by-mail; volunteers help with ballot processing"},
+  {code:"PA",name:"Pennsylvania",sos:"https://www.vote.pa.gov/Resources/Pages/Poll-Worker.aspx",pay:"$125–$200/day",req:"Registered voter in county",note:"Apply through County Board of Elections"},
+  {code:"RI",name:"Rhode Island",sos:"https://elections.ri.gov/elections/pollworkers/",pay:"$150–$225/day",req:"Registered voter in city/town",note:"Apply through city/town Board of Canvassers"},
+  {code:"SC",name:"South Carolina",sos:"https://www.scvotes.gov/how-south-carolina-votes/poll-workers",pay:"$75–$150/day",req:"Registered voter in county",note:"Apply through County Election Commission"},
+  {code:"SD",name:"South Dakota",sos:"https://sdsos.gov/elections-voting/voting/poll-workers.aspx",pay:"$50–$125/day",req:"Registered voter in county",note:"Apply through county auditor"},
+  {code:"TN",name:"Tennessee",sos:"https://sos.tn.gov/elections/guides/how-to-become-poll-worker",pay:"$100–$175/day",req:"Registered voter in county",note:"Apply through County Election Commission"},
+  {code:"TX",name:"Texas",sos:"https://www.sos.texas.gov/elections/voter/pollplace.shtml",pay:"$100–$200/day",req:"Registered voter in county; students 16+ eligible",note:"Apply through County Elections Office"},
+  {code:"UT",name:"Utah",sos:"https://elections.utah.gov/election-resources/election-judges",pay:"$125–$200/day",req:"Registered voter",note:"Some counties fully vote-by-mail; judge roles vary"},
+  {code:"VT",name:"Vermont",sos:"https://sos.vermont.gov/elections/voters/poll-worker-information/",pay:"$100–$175/day",req:"Registered voter in town",note:"Apply through town clerk"},
+  {code:"VA",name:"Virginia",sos:"https://www.elections.virginia.gov/casting-a-ballot/poll-workers/",pay:"$175–$250/day",req:"Registered VA voter; students 17+ eligible",note:"Apply through General Registrar's Office in your locality"},
+  {code:"WA",name:"Washington",sos:"https://www.sos.wa.gov/elections/work-for-elections",pay:"$12–$18/hr",req:"Registered voter or US citizen 18+",note:"Washington is all vote-by-mail; volunteer at ballot processing centers"},
+  {code:"WV",name:"West Virginia",sos:"https://sos.wv.gov/elections/Pages/PollWorkerInformation.aspx",pay:"$75–$150/day",req:"Registered voter in county",note:"Apply through County Clerk"},
+  {code:"WI",name:"Wisconsin",sos:"https://myvote.wi.gov/en-us/Volunteer-for-Elections",pay:"$125–$200/day",req:"Registered voter; students 17+ eligible",note:"Apply through city, village, or town clerk"},
+  {code:"WY",name:"Wyoming",sos:"https://sos.wyo.gov/elections/default.aspx",pay:"$75–$150/day",req:"Registered voter in county",note:"Apply through County Clerk"},
+  {code:"DC",name:"Washington D.C.",sos:"https://dcboe.org/voters/work-the-polls",pay:"$175–$275/day",req:"Registered DC voter",note:"Apply through DC Board of Elections"}
+];
+
+// Iowa counties
+const IOWA_COUNTIES = [
+  {name:"Polk (Des Moines)",url:"https://www.polkcountyiowa.gov/auditor/elections/"},
+  {name:"Linn (Cedar Rapids)",url:"https://www.linncounty.org/auditor/elections/"},
+  {name:"Scott (Davenport)",url:"https://www.scottcountyiowa.gov/auditor/elections"},
+  {name:"Johnson (Iowa City)",url:"https://www.johnson-county.com/dept/auditor/elections/pages/default.aspx"},
+  {name:"Black Hawk (Waterloo)",url:"https://www.blackhawkcounty.iowa.gov/auditor/elections.asp"},
+  {name:"Woodbury (Sioux City)",url:"https://www.woodburyiowa.com/auditor/elections.asp"},
+  {name:"Dubuque",url:"https://www.dubuquecounty.iowa.gov/auditor/elections/"},
+  {name:"Story (Ames)",url:"https://www.storycounty.com/auditor/elections/"},
+  {name:"Pottawattamie (Council Bluffs)",url:"https://www.pottcounty.com/government/auditor/elections/"},
+  {name:"Dallas (Adel)",url:"https://www.dallascountyiowa.gov/auditor/elections"},
+  {name:"Warren",url:"https://www.warrencounty.org/auditor/elections.asp"},
+  {name:"Clinton",url:"https://www.clintoncounty-ia.gov/auditor/"},
+  {name:"Muscatine",url:"https://www.muscatinecounty.com/auditor/"},
+  {name:"Marion",url:"https://www.co.marion.ia.us/auditor/elections/"},
+  {name:"Marshall (Marshalltown)",url:"https://www.co.marshall.ia.us/departments/auditor/index.html"},
+  {name:"Cerro Gordo (Mason City)",url:"https://www.cerrogordocountyiowa.gov/auditor/"},
+];
+
+// ── Build Iowa county grid ─────────────────────────────────────────────────
+const countyGrid = document.getElementById('iowa-counties');
+IOWA_COUNTIES.forEach(c => {
+  countyGrid.innerHTML += `<div class="county-item">${c.name}<a href="${c.url}" target="_blank" rel="noopener">Apply →</a></div>`;
+});
+
+// ── Build state selector ───────────────────────────────────────────────────
+const sel = document.getElementById('state-select');
+STATES.forEach(s => {
+  const opt = document.createElement('option');
+  opt.value = s.code;
+  opt.textContent = s.name;
+  sel.appendChild(opt);
+});
+
+function filterStates(query) {
+  const q = query.toLowerCase();
+  Array.from(sel.options).forEach(opt => {
+    opt.hidden = opt.value && !opt.text.toLowerCase().includes(q);
+  });
+  const visible = STATES.filter(s => s.name.toLowerCase().includes(q));
+  if (visible.length === 1) showState(visible[0].code);
+}
+
+function showState(code) {
+  if (!code) return;
+  sel.value = code;
+  const s = STATES.find(x => x.code === code);
+  if (!s) return;
+
+  const iowa = s.code === 'IA';
+  document.getElementById('state-content').innerHTML = `
+    <div class="state-panel active">
+      <div class="state-name-header">${iowa ? '🌽 ' : ''}${s.name}</div>
+      <div class="state-sos">Official election website: <a href="${s.sos}" target="_blank" rel="noopener">${s.sos.replace('https://','').split('/')[0]}</a></div>
+      <div class="state-cols">
+        <div class="state-card">
+          <div class="state-card-title"><span class="icon">💵</span>Poll Worker Pay</div>
+          <p>Typical compensation for serving as a poll worker in ${s.name}.</p>
+          <strong style="color:var(--green);font-size:18px;">${s.pay}</strong>
+        </div>
+        <div class="state-card">
+          <div class="state-card-title"><span class="icon">✅</span>Requirements</div>
+          <p>${s.req}</p>
+          ${iowa ? '<p style="color:var(--primary);font-size:12px;">Iowa students 17+ may serve with county approval.</p>' : ''}
+        </div>
+        <div class="state-card">
+          <div class="state-card-title"><span class="icon">📌</span>How to Apply</div>
+          <p>${s.note}</p>
+          <a href="${s.sos}" target="_blank" rel="noopener">Sign Up to Work Polls →</a>
+        </div>
+        ${iowa ? `
+        <div class="state-card">
+          <div class="state-card-title"><span class="icon">🏛️</span>Find Your County Auditor</div>
+          <p>Iowa's 99 County Auditors run local elections. Find yours to apply for a poll worker or observer position.</p>
+          <a href="https://sos.iowa.gov/elections/auditors/auditorslist.html" target="_blank" rel="noopener">All 99 County Auditors →</a>
+        </div>
+        <div class="state-card">
+          <div class="state-card-title"><span class="icon">🏘️</span>Iowa Precinct Captains</div>
+          <p>Contact the Iowa Democratic Party or Iowa Republican Party to become a precinct captain in your neighborhood.</p>
+          <a href="https://www.iowademocrats.org/" target="_blank" rel="noopener">Iowa Democrats →</a>
+        </div>
+        <div class="state-card">
+          <div class="state-card-title"><span class="icon">👁️</span>Iowa Canvassing Board</div>
+          <p>County Boards of Supervisors serve as the canvassing board. Observers from parties and campaigns may attend all canvass sessions.</p>
+          <a href="https://sos.iowa.gov/elections/pdf/canvassbooklet.pdf" target="_blank" rel="noopener">Iowa Canvass Guide (PDF) →</a>
+        </div>
+        ` : ''}
+      </div>
+    </div>`;
+}
+
+// Auto-show Iowa on load
+showState('IA');
+</script>
+</body>
+</html>

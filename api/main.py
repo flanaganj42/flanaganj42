@@ -338,6 +338,13 @@ async def generate(req: GenerateRequest):
     return r.json()
 
 # ── News feed ─────────────────────────────────────────────────────────────────
+@app.get("/elections", response_class=HTMLResponse)
+async def elections_page():
+    p = Path(__file__).parent / "elections.html"
+    if not p.exists():
+        raise HTTPException(404, "elections.html not found")
+    return p.read_text()
+
 @app.get("/news", response_class=HTMLResponse)
 async def news_page():
     p = Path(__file__).parent / "news.html"
