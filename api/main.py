@@ -7,6 +7,7 @@ from urllib.parse import quote
 import httpx
 import news as _news
 import hearings as _hearings
+import substack as _substack
 from fastapi import FastAPI, Depends, HTTPException, Header, BackgroundTasks, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
@@ -337,6 +338,45 @@ async def generate(req: GenerateRequest):
         )
     r.raise_for_status()
     return r.json()
+
+# ── Substack publisher ────────────────────────────────────────────────────────
+class SubstackPublishRequest(BaseModel):
+    story_id: str | None = None  # publish specific story by ID; None = auto-pick top story
+
+@app.post("/substack/publish", dependencies=[Depends(require_key)])
+async def substack_publish(req: SubstackPublishRequest = SubstackPublishRequest()):
+    loop = asyncio.get_event_loop()
+    feed = _news.get_feed(limit=60)
+    if not feed:
+        raise HTTPException(503, "No stories available — wait for news feed to populate")
+    if req.story_id:
+        story = next((s for s in feed if s["id"] == req.story_id), None)
+        if not story:
+            raise HTTPException(404, "Story not found")
+    else:
+        story = max(feed, key=lambda s: (s.get("uplifted", 0), s.get("civic_score", 0), s.get("coverage_count", 1)))
+    result = await loop.run_in_executor(None, lambda: _substack.publish_story(story))
+    return result
+
+@app.get("/substack/history", dependencies=[Depends(require_key)])
+async def substack_history():
+    return _substack.get_history()
+
+@app.get("/substack/preview", dependencies=[Depends(require_key)])
+async def substack_preview(story_id: str | None = None):
+    """Generate editorial content without publishing — for review."""
+    loop = asyncio.get_event_loop()
+    feed = _news.get_feed(limit=60)
+    if not feed:
+        raise HTTPException(503, "No stories available")
+    if story_id:
+        story = next((s for s in feed if s["id"] == story_id), None)
+        if not story:
+            raise HTTPException(404, "Story not found")
+    else:
+        story = max(feed, key=lambda s: (s.get("uplifted", 0), s.get("civic_score", 0), s.get("coverage_count", 1)))
+    editorial = await loop.run_in_executor(None, lambda: _substack.generate_editorial(story))
+    return {"story": story, "editorial": editorial}
 
 # ── News feed ─────────────────────────────────────────────────────────────────
 # ── Hearings ──────────────────────────────────────────────────────────────────
