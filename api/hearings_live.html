@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hearing Live — CivicResilience OBS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;}
+#embed-frame{position:absolute;inset:0;width:100%;height:100%;border:none;display:none;}
+#standby{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#050f1c,#0c1f35);color:#fff;font-family:'Arial',sans-serif;text-align:center;gap:16px;}
+.s-icon{font-size:64px;opacity:.4;}
+.s-title{font-size:22px;font-weight:700;color:#00b4d8;letter-spacing:.05em;text-transform:uppercase;}
+.s-sub{font-size:14px;color:#64748b;max-width:400px;line-height:1.6;}
+.s-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 10px #ef4444;animation:blink 2s ease-in-out infinite;display:inline-block;margin-right:6px;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+#stream-label{position:absolute;top:16px;left:16px;background:rgba(0,0,0,.7);border:1px solid rgba(0,180,216,.3);border-radius:6px;padding:6px 12px;font-size:12px;color:#00b4d8;font-family:Arial,sans-serif;display:none;backdrop-filter:blur(8px);}
+</style>
+</head>
+<body>
+
+<div id="standby">
+  <div class="s-icon">🏛️</div>
+  <div class="s-title"><span class="s-dot"></span>Awaiting Hearing Stream</div>
+  <div class="s-sub">Select a congressional hearing from the Hearings control panel to begin streaming.</div>
+</div>
+
+<iframe id="embed-frame" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+<div id="stream-label"></div>
+
+<script>
+const API = 'https://api.civicresilience.net';
+let currentVersion = -1;
+
+async function poll() {
+  try {
+    const r = await fetch(`${API}/hearings/stream`);
+    const d = await r.json();
+    if (d.version !== currentVersion) {
+      currentVersion = d.version;
+      applyStream(d);
+    }
+  } catch(e) {}
+}
+
+function applyStream(d) {
+  const frame = document.getElementById('embed-frame');
+  const standby = document.getElementById('standby');
+  const label = document.getElementById('stream-label');
+
+  if (d.embed_url) {
+    frame.src = d.embed_url;
+    frame.style.display = 'block';
+    standby.style.display = 'none';
+    if (d.title || d.committee) {
+      label.textContent = [d.committee, d.title].filter(Boolean).join(' — ');
+      label.style.display = 'block';
+    }
+  } else {
+    frame.src = '';
+    frame.style.display = 'none';
+    standby.style.display = 'flex';
+    label.style.display = 'none';
+  }
+}
+
+poll();
+setInterval(poll, 5000);
+</script>
+</body>
+</html>

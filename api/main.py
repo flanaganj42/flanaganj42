@@ -6,6 +6,7 @@ from urllib.parse import quote
 
 import httpx
 import news as _news
+import hearings as _hearings
 from fastapi import FastAPI, Depends, HTTPException, Header, BackgroundTasks, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
@@ -338,6 +339,47 @@ async def generate(req: GenerateRequest):
     return r.json()
 
 # ── News feed ─────────────────────────────────────────────────────────────────
+# ── Hearings ──────────────────────────────────────────────────────────────────
+@app.get("/hearings", response_class=HTMLResponse)
+async def hearings_page():
+    p = Path(__file__).parent / "hearings.html"
+    if not p.exists():
+        raise HTTPException(404, "hearings.html not found")
+    return p.read_text()
+
+@app.get("/hearings/live", response_class=HTMLResponse)
+async def hearings_live():
+    p = Path(__file__).parent / "hearings_live.html"
+    if not p.exists():
+        raise HTTPException(404, "hearings_live.html not found")
+    return p.read_text()
+
+@app.get("/hearings/stream")
+async def get_hearing_stream():
+    return _hearings.get_stream()
+
+class HearingStreamRequest(BaseModel):
+    url: str
+    title: str = ""
+    committee: str = ""
+
+@app.post("/hearings/stream", dependencies=[Depends(require_key)])
+async def set_hearing_stream(req: HearingStreamRequest):
+    return _hearings.set_stream(req.url, req.title, req.committee)
+
+@app.delete("/hearings/stream", dependencies=[Depends(require_key)])
+async def clear_hearing_stream():
+    return _hearings.clear_stream()
+
+@app.get("/hearings/schedule")
+async def hearing_schedule(days: int = Query(7, le=14)):
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, lambda: _hearings.get_schedule(days))
+
+@app.get("/hearings/committees")
+async def hearing_committees():
+    return _hearings.committee_list()
+
 @app.get("/elections", response_class=HTMLResponse)
 async def elections_page():
     p = Path(__file__).parent / "elections.html"

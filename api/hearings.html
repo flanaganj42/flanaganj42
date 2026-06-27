@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Congressional Hearings — Civic Resilience</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#050f1c;--bg2:#0c1f35;--bg3:#0f2540;
+  --border:#1a3a5c;--border2:#1e4a70;
+  --primary:#00b4d8;--primary-dim:#0090aa;--primary-glow:rgba(0,180,216,0.25);
+  --green:#10b981;--amber:#f59e0b;--red:#ef4444;--purple:#8b5cf6;
+  --cspan:#1a56db;--house:#16a34a;--senate:#9333ea;
+  --text:#e2e8f0;--muted:#64748b;--muted2:#8da8c4;--white:#fff;
+  --radius:12px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6;min-height:100vh;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 28px;height:60px;display:flex;align-items:center;background:rgba(5,15,28,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(26,58,92,0.6);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 10px #ef4444;animation:blink 2s infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.nav-wordmark{font-size:15px;font-weight:700;color:var(--primary);letter-spacing:.05em;text-transform:uppercase;}
+.nav-links{display:flex;gap:4px;margin-left:auto;align-items:center;}
+.nav-links a{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--muted2);text-decoration:none;transition:.15s;}
+.nav-links a:hover{color:var(--white);background:rgba(255,255,255,.06);}
+.nav-links a.active{color:var(--primary);}
+.nav-cta{background:var(--primary)!important;color:#000!important;font-weight:700!important;}
+
+/* LAYOUT */
+.page{padding:80px 24px 48px;max-width:1280px;margin:0 auto;}
+.page-title{font-size:28px;font-weight:900;color:var(--white);margin-bottom:4px;}
+.page-sub{font-size:14px;color:var(--muted2);margin-bottom:32px;}
+
+/* LIVE STATUS */
+#live-status{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.live-status-icon{font-size:28px;flex-shrink:0;}
+.live-status-info{flex:1;}
+.live-status-title{font-size:15px;font-weight:700;color:var(--white);}
+.live-status-sub{font-size:12px;color:var(--muted2);}
+.live-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
+.live-badge.on{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#ef4444;}
+.live-badge.off{background:rgba(100,116,139,.1);border:1px solid rgba(100,116,139,.2);color:var(--muted);}
+.status-actions{display:flex;gap:8px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;border:none;cursor:pointer;transition:.15s;font-family:'Inter',sans-serif;}
+.btn-primary{background:var(--primary);color:#000;}
+.btn-primary:hover{background:var(--primary-dim);}
+.btn-red{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);}
+.btn-red:hover{background:rgba(239,68,68,.25);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text);}
+.btn-ghost:hover{border-color:var(--primary);color:var(--primary);}
+.btn-obs{background:rgba(0,180,216,.12);color:var(--primary);border:1px solid rgba(0,180,216,.3);font-size:12px;padding:6px 14px;}
+.btn-obs:hover{background:rgba(0,180,216,.22);}
+.btn-obs.loading{opacity:.5;pointer-events:none;}
+.btn-obs.sent{background:rgba(16,185,129,.12);color:var(--green);border-color:rgba(16,185,129,.3);}
+
+/* CUSTOM URL */
+.url-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:28px;}
+.url-bar-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:12px;}
+.url-row{display:flex;gap:10px;flex-wrap:wrap;}
+.url-input{flex:1;min-width:280px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:13px;font-family:'Inter',sans-serif;}
+.url-input::placeholder{color:var(--muted);}
+.url-input:focus{outline:none;border-color:var(--primary);}
+.title-input{width:220px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--white);font-size:13px;font-family:'Inter',sans-serif;}
+.title-input::placeholder{color:var(--muted);}
+.title-input:focus{outline:none;border-color:var(--primary);}
+.url-hint{font-size:11px;color:var(--muted);margin-top:8px;}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;}
+.tab{padding:10px 20px;border-radius:8px 8px 0 0;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted2);border:none;background:transparent;transition:.15s;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:'Inter',sans-serif;}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+.tab:hover:not(.active){color:var(--white);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* TYPE BADGES */
+.type-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-right:6px;}
+.type-cspan{background:rgba(26,86,219,.2);color:#60a5fa;border:1px solid rgba(26,86,219,.3);}
+.type-house{background:rgba(22,163,74,.15);color:#4ade80;border:1px solid rgba(22,163,74,.25);}
+.type-senate{background:rgba(147,51,234,.15);color:#c084fc;border:1px solid rgba(147,51,234,.25);}
+
+/* COMMITTEE GRID */
+.committee-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+.committee-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.committee-name{font-size:13px;font-weight:700;color:var(--white);}
+.committee-actions{display:flex;gap:8px;align-items:center;}
+.committee-link{font-size:11px;color:var(--primary);text-decoration:none;}
+.committee-link:hover{text-decoration:underline;}
+
+/* SCHEDULE */
+.schedule-list{display:flex;flex-direction:column;gap:12px;}
+.hearing-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;display:flex;gap:16px;align-items:flex-start;}
+.hearing-card.live-now{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.04);}
+.hearing-time{text-align:center;min-width:56px;flex-shrink:0;}
+.hearing-time-val{font-size:15px;font-weight:700;color:var(--primary);}
+.hearing-time-day{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.hearing-body{flex:1;}
+.hearing-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px;}
+.hearing-committee{font-size:12px;color:var(--muted2);}
+.hearing-actions{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;}
+.schedule-empty{text-align:center;padding:48px;color:var(--muted);font-size:14px;}
+.schedule-loading{text-align:center;padding:48px;color:var(--muted2);}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* KEY INPUT */
+.key-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;}
+.key-row label{font-size:12px;color:var(--muted2);white-space:nowrap;}
+.key-input{flex:1;max-width:360px;padding:7px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--white);font-size:12px;font-family:monospace;}
+.key-input:focus{outline:none;border-color:var(--primary);}
+.key-hint{font-size:11px;color:var(--muted);}
+
+/* OBS SETUP BOX */
+.obs-setup{background:rgba(0,180,216,.05);border:1px solid rgba(0,180,216,.2);border-radius:var(--radius);padding:16px 20px;margin-bottom:28px;font-size:12px;color:var(--muted2);}
+.obs-setup strong{color:var(--white);}
+.obs-setup code{background:var(--bg3);padding:2px 6px;border-radius:4px;font-size:11px;color:var(--primary);}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <span class="live-dot"></span>
+    <span class="nav-wordmark">Civic Resilience</span>
+  </a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/news">News</a>
+    <a href="/elections">Elections</a>
+    <a href="/hearings" class="active">Hearings</a>
+    <a href="/control" class="nav-cta">Control</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-title">🏛️ Congressional Hearings</div>
+  <div class="page-sub">Stream live hearings directly into OBS — select from the schedule or paste any stream URL.</div>
+
+  <!-- API Key -->
+  <div class="key-row">
+    <label>API Key</label>
+    <input class="key-input" id="api-key" type="password" placeholder="Paste your CivicResilience API key">
+    <span class="key-hint">Same key used in /control</span>
+  </div>
+
+  <!-- OBS Setup hint -->
+  <div class="obs-setup">
+    <strong>OBS Setup:</strong> Add a new Browser Source in OBS → set URL to
+    <code>https://api.civicresilience.net/hearings/live</code>, size <strong>1920×1080</strong>, check <em>Control audio via OBS</em>.
+    Then select any hearing below and click <strong>Load in OBS</strong> — the browser source will update within 5 seconds.
+  </div>
+
+  <!-- Live status -->
+  <div id="live-status">
+    <div class="live-status-icon">📡</div>
+    <div class="live-status-info">
+      <div class="live-status-title" id="status-title">No hearing loaded</div>
+      <div class="live-status-sub" id="status-sub">OBS hearing browser source is on standby</div>
+    </div>
+    <span class="live-badge off" id="live-badge">STANDBY</span>
+    <div class="status-actions">
+      <button class="btn btn-red" id="clear-btn" onclick="clearStream()" style="display:none">✕ Clear Stream</button>
+      <a class="btn btn-ghost" href="/hearings/live" target="_blank">Preview OBS Frame ↗</a>
+    </div>
+  </div>
+
+  <!-- Custom URL -->
+  <div class="url-bar">
+    <div class="url-bar-title">Load Any Stream URL</div>
+    <div class="url-row">
+      <input class="url-input" id="custom-url" type="url" placeholder="Paste YouTube, C-SPAN, or committee stream URL...">
+      <input class="title-input" id="custom-title" type="text" placeholder="Label (optional)">
+      <button class="btn btn-primary" onclick="loadCustom()">Load in OBS</button>
+    </div>
+    <div class="url-hint">Supports YouTube watch/live URLs (auto-converts to embed) and any iframe-compatible stream URL.</div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('schedule',this)">📅 Schedule</button>
+    <button class="tab" onclick="switchTab('cspan',this)">📺 C-SPAN Live</button>
+    <button class="tab" onclick="switchTab('house',this)">🏛️ House Committees</button>
+    <button class="tab" onclick="switchTab('senate',this)">⚖️ Senate Committees</button>
+  </div>
+
+  <!-- Schedule tab -->
+  <div class="tab-panel active" id="tab-schedule">
+    <div id="schedule-container">
+      <div class="schedule-loading"><span class="spinner"></span>Loading hearing schedule from Congress.gov…</div>
+    </div>
+  </div>
+
+  <!-- C-SPAN tab -->
+  <div class="tab-panel" id="tab-cspan">
+    <div class="committee-grid" id="grid-cspan"></div>
+  </div>
+
+  <!-- House tab -->
+  <div class="tab-panel" id="tab-house">
+    <div class="committee-grid" id="grid-house"></div>
+  </div>
+
+  <!-- Senate tab -->
+  <div class="tab-panel" id="tab-senate">
+    <div class="committee-grid" id="grid-senate"></div>
+  </div>
+</div>
+
+<script>
+const BASE = window.location.origin;
+let KEY = localStorage.getItem('cr_api_key') || '';
+
+// Load saved key
+document.getElementById('api-key').value = KEY;
+document.getElementById('api-key').addEventListener('input', e => {
+  KEY = e.target.value.trim();
+  localStorage.setItem('cr_api_key', KEY);
+});
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// ── Stream state polling ───────────────────────────────────────────────────────
+async function pollStatus() {
+  try {
+    const r = await fetch(`${BASE}/hearings/stream`);
+    const d = await r.json();
+    updateStatusBar(d);
+  } catch(e) {}
+}
+
+function updateStatusBar(d) {
+  const title = document.getElementById('status-title');
+  const sub = document.getElementById('status-sub');
+  const badge = document.getElementById('live-badge');
+  const clearBtn = document.getElementById('clear-btn');
+
+  if (d.url) {
+    title.textContent = d.title || d.url;
+    sub.textContent = d.committee ? `Committee: ${d.committee}` : 'Streaming to OBS browser source';
+    badge.className = 'live-badge on';
+    badge.textContent = '● LIVE';
+    clearBtn.style.display = '';
+  } else {
+    title.textContent = 'No hearing loaded';
+    sub.textContent = 'OBS hearing browser source is on standby';
+    badge.className = 'live-badge off';
+    badge.textContent = 'STANDBY';
+    clearBtn.style.display = 'none';
+  }
+}
+
+// ── Load stream ───────────────────────────────────────────────────────────────
+async function loadStream(url, title, committee, btn) {
+  if (!KEY) { alert('Enter your API key first.'); return; }
+  if (btn) { btn.classList.add('loading'); btn.textContent = 'Loading…'; }
+  try {
+    const r = await fetch(`${BASE}/hearings/stream`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': KEY },
+      body: JSON.stringify({ url, title, committee }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const d = await r.json();
+    updateStatusBar(d);
+    if (btn) { btn.classList.remove('loading'); btn.classList.add('sent'); btn.textContent = '✓ Loaded'; setTimeout(() => { btn.classList.remove('sent'); btn.textContent = '📺 Load in OBS'; }, 3000); }
+  } catch(e) {
+    alert('Error: ' + e.message);
+    if (btn) { btn.classList.remove('loading'); btn.textContent = '📺 Load in OBS'; }
+  }
+}
+
+async function clearStream() {
+  if (!KEY) { alert('Enter your API key first.'); return; }
+  await fetch(`${BASE}/hearings/stream`, { method: 'DELETE', headers: { 'x-api-key': KEY } });
+  pollStatus();
+}
+
+function loadCustom() {
+  const url = document.getElementById('custom-url').value.trim();
+  const title = document.getElementById('custom-title').value.trim();
+  if (!url) { alert('Enter a stream URL first.'); return; }
+  loadStream(url, title, '', null);
+}
+
+// ── Committee grids ───────────────────────────────────────────────────────────
+async function loadCommittees() {
+  try {
+    const r = await fetch(`${BASE}/hearings/committees`);
+    const list = await r.json();
+    const grids = { cspan: '', house: '', senate: '' };
+    list.forEach(c => {
+      const type = c.type;
+      const key = type === 'cspan' ? 'cspan' : type === 'house' ? 'house' : 'senate';
+      const badge = `<span class="type-badge type-${type}">${type === 'cspan' ? 'C-SPAN' : type}</span>`;
+      grids[key] += `
+        <div class="committee-card">
+          <div class="committee-name">${badge}${c.name}</div>
+          <div class="committee-actions">
+            <button class="btn btn-obs" onclick="promptLoad('${esc(c.url)}','${esc(c.name)}','','OBS',this)">📺 Open &amp; Load</button>
+            <a class="committee-link" href="${c.url}" target="_blank" rel="noopener">Find Live Stream ↗</a>
+          </div>
+        </div>`;
+    });
+    document.getElementById('grid-cspan').innerHTML = grids.cspan;
+    document.getElementById('grid-house').innerHTML = grids.house;
+    document.getElementById('grid-senate').innerHTML = grids.senate;
+  } catch(e) {
+    ['cspan','house','senate'].forEach(k => {
+      document.getElementById('grid-' + k).innerHTML = '<div class="schedule-empty">Failed to load committee list.</div>';
+    });
+  }
+}
+
+function promptLoad(url, name, committee, label, btn) {
+  // Open committee page so user can find current live stream URL
+  window.open(url, '_blank');
+  // Show prompt for them to paste the actual stream URL
+  const streamUrl = window.prompt(`After finding the live stream on ${name}, paste the YouTube/stream URL here:`);
+  if (streamUrl && streamUrl.trim()) {
+    loadStream(streamUrl.trim(), name, committee, null);
+  }
+}
+
+function esc(s) { return s.replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+// ── Hearing schedule ──────────────────────────────────────────────────────────
+async function loadSchedule() {
+  try {
+    const r = await fetch(`${BASE}/hearings/schedule`);
+    const hearings = await r.json();
+    const container = document.getElementById('schedule-container');
+
+    if (!hearings.length) {
+      container.innerHTML = `<div class="schedule-empty">🗓️ No upcoming hearings found in the next 7 days from Congress.gov.<br><br>Try C-SPAN or committee tabs for live streams.</div>`;
+      return;
+    }
+
+    const now = Date.now();
+    let html = '<div class="schedule-list">';
+    hearings.forEach(h => {
+      const dt = h.date ? new Date(h.date) : null;
+      const timeStr = dt ? dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
+      const dayStr = dt ? dt.toLocaleDateString([], { month: 'short', day: 'numeric' }) : '';
+      const isLive = dt && Math.abs(dt - now) < 3 * 60 * 60 * 1000;
+      const chamberBadge = h.chamber === 'House'
+        ? '<span class="type-badge type-house">House</span>'
+        : h.chamber === 'Senate'
+        ? '<span class="type-badge type-senate">Senate</span>'
+        : '';
+
+      html += `
+        <div class="hearing-card${isLive ? ' live-now' : ''}">
+          <div class="hearing-time">
+            <div class="hearing-time-val">${timeStr}</div>
+            <div class="hearing-time-day">${dayStr}</div>
+            ${isLive ? '<div class="live-badge on" style="margin-top:6px;font-size:9px;">LIVE</div>' : ''}
+          </div>
+          <div class="hearing-body">
+            <div class="hearing-title">${chamberBadge}${h.title}</div>
+            ${h.committee ? `<div class="hearing-committee">${h.committee}</div>` : ''}
+            <div class="hearing-actions">
+              <button class="btn btn-obs" onclick="findAndLoad('${esc(h.title)}','${esc(h.committee)}',this)">📺 Find &amp; Load in OBS</button>
+              ${h.url ? `<a class="btn btn-ghost" href="${h.url}" target="_blank" rel="noopener" style="font-size:12px;padding:6px 12px;">Congress.gov ↗</a>` : ''}
+            </div>
+          </div>
+        </div>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+  } catch(e) {
+    document.getElementById('schedule-container').innerHTML = `<div class="schedule-empty">Unable to load schedule from Congress.gov.<br>Check C-SPAN or committee tabs for live streams.</div>`;
+  }
+}
+
+function findAndLoad(title, committee, btn) {
+  const query = encodeURIComponent(title + ' ' + committee + ' hearing live stream');
+  window.open(`https://www.c-span.org/search/?query=${query}`, '_blank');
+  const url = window.prompt(`Search C-SPAN or YouTube for "${title}" — then paste the stream URL here:`);
+  if (url && url.trim()) {
+    loadStream(url.trim(), title, committee, btn);
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadSchedule();
+loadCommittees();
+pollStatus();
+setInterval(pollStatus, 8000);
+</script>
+</body>
+</html>
