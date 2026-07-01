@@ -434,6 +434,13 @@ async def power_image(scene: str):
         raise HTTPException(404, f"Image not found: {fname}")
     return FileResponse(str(p), media_type="image/png")
 
+@app.get("/overlay/power/cycle", response_class=HTMLResponse)
+async def power_cycle_overlay():
+    p = Path(__file__).parent / "power_cycle.html"
+    if not p.exists():
+        raise HTTPException(404, "power_cycle.html not found")
+    return p.read_text()
+
 @app.get("/overlay/power/balance", response_class=HTMLResponse)
 async def power_balance_overlay():
     p = Path(__file__).parent / "power_balance.html"

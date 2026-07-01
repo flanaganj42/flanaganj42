@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Balance of Power Cycle — CivicResilience OBS</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: #000;
+  font-family: 'Georgia', serif;
+}
+
+/* ── Slide panels ── */
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
+.slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+.slide.exiting {
+  opacity: 0;
+  z-index: 0;
+}
+
+.bg {
+  position: absolute;
+  inset: 0;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center top;
+}
+
+.vignette {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 360px;
+}
+
+/* ── Title card ── */
+.title-card {
+  position: absolute;
+  top: 28px;
+  left: 40px;
+  border-left: 5px solid;
+  padding: 14px 28px 14px 22px;
+  backdrop-filter: blur(6px);
+}
+.title-card .label {
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-family: 'Arial', sans-serif;
+}
+.title-card .headline {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+.title-card .sub {
+  font-size: 15px;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+/* ── Branding ── */
+.branding {
+  position: absolute;
+  top: 28px;
+  right: 40px;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 8px 16px;
+  text-align: center;
+  backdrop-filter: blur(6px);
+}
+.branding .name {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-family: 'Arial', sans-serif;
+}
+.branding .url {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 2px;
+  font-family: 'Arial', sans-serif;
+}
+
+/* ── Bottom bar ── */
+.bottom-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 0 18px 0;
+}
+.scene-label {
+  padding: 0 40px 10px 40px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: 'Arial', sans-serif;
+}
+.status-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.scene-name {
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ── Ticker ── */
+.ticker-wrap {
+  overflow: hidden;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  padding: 16px 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+}
+.ticker-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+}
+.ticker-text {
+  font-size: 18px;
+  color: #e2e8f0;
+  font-family: 'Georgia', serif;
+  line-height: 1.4;
+  padding: 0 60px;
+}
+.ticker-bullet {
+  font-size: 22px;
+  padding: 0 20px;
+}
+
+/* ── Progress bar ── */
+#progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.5);
+  z-index: 10;
+  transition: none;
+}
+
+/* ── Slide A — Blue (Balance / Status Quo) ── */
+#slide-a .bg {
+  background-image: url('/overlay/power/image/balance');
+  background-color: #000c1e;
+}
+#slide-a .vignette {
+  background: linear-gradient(to bottom, transparent 0%, rgba(0,12,30,0.85) 45%, rgba(0,12,30,0.97) 100%);
+}
+#slide-a .title-card {
+  background: rgba(0,40,100,0.88);
+  border-left-color: #3b82f6;
+}
+#slide-a .title-card .label { color: #93c5fd; }
+#slide-a .title-card .sub   { color: #bfdbfe; }
+#slide-a .branding {
+  background: rgba(0,0,0,0.6);
+  border-color: rgba(59,130,246,0.4);
+}
+#slide-a .branding .name { color: #60a5fa; }
+#slide-a .status-dot {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+#slide-a .scene-name { color: #22c55e; }
+#slide-a .ticker-wrap {
+  border-color: rgba(59,130,246,0.5) transparent rgba(59,130,246,0.3) transparent;
+  background: rgba(0,20,60,0.7);
+}
+#slide-a .ticker-bullet { color: #3b82f6; }
+#slide-a .ticker-track { animation: scroll-a 95s linear infinite; }
+
+@keyframes scroll-a {
+  0%   { transform: translateX(1920px); }
+  100% { transform: translateX(-100%); }
+}
+
+/* ── Slide B — Red (Imbalance / Corrupted Now) ── */
+#slide-b .bg {
+  background-image: url('/overlay/power/image/imbalance');
+  background-color: #0a0000;
+}
+#slide-b .vignette {
+  background: linear-gradient(to bottom, transparent 0%, rgba(20,0,0,0.85) 45%, rgba(20,0,0,0.97) 100%);
+}
+#slide-b .title-card {
+  background: rgba(100,0,0,0.85);
+  border-left-color: #ef4444;
+}
+#slide-b .title-card .label { color: #fca5a5; }
+#slide-b .title-card .sub   { color: #fecaca; }
+#slide-b .branding {
+  background: rgba(127,0,0,0.75);
+  border-color: rgba(239,68,68,0.6);
+}
+#slide-b .branding .name { color: #f87171; }
+#slide-b .status-dot {
+  background: #ef4444;
+  box-shadow: 0 0 10px #ef4444;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+#slide-b .scene-name { color: #ef4444; }
+#slide-b .ticker-wrap {
+  border-color: rgba(239,68,68,0.5) transparent rgba(239,68,68,0.3) transparent;
+  background: rgba(30,0,0,0.8);
+}
+#slide-b .ticker-bullet { color: #ef4444; }
+#slide-b .ticker-track { animation: scroll-b 115s linear infinite; }
+
+@keyframes scroll-b {
+  0%   { transform: translateX(1920px); }
+  100% { transform: translateX(-100%); }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Slide A: Balance of Power — Status Quo ── -->
+<div id="slide-a" class="slide active">
+  <div class="bg"></div>
+  <div class="vignette"></div>
+
+  <div class="title-card">
+    <div class="label">Civic Education Series</div>
+    <div class="headline">The Constitutional Balance of Power</div>
+    <div class="sub">Original Design — Ratified 1788</div>
+  </div>
+
+  <div class="branding">
+    <div class="name">Civic Resilience Network</div>
+    <div class="url">civicresilience.net</div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="scene-label">
+      <div class="status-dot"></div>
+      <div class="scene-name">Historical Framework — Three Co-Equal Branches</div>
+    </div>
+    <div class="ticker-wrap">
+      <div class="ticker-track">
+        <span class="ticker-text">The framers of the U.S. Constitution deliberately fragmented power to prevent tyranny. Three co-equal branches — Legislative, Executive, and Judicial — were granted distinct, enumerated powers. Congress alone writes law and controls the federal purse. The President executes law but cannot make it unilaterally. Courts interpret law but cannot enforce it.</span>
+        <span class="ticker-bullet">◆</span>
+        <span class="ticker-text">Each branch was given tools to limit the others. Congress can impeach the President and override vetoes. The President can veto legislation and nominate judges. Courts can strike down laws and executive actions as unconstitutional.</span>
+        <span class="ticker-bullet">◆</span>
+        <span class="ticker-text">James Madison warned in Federalist No. 47: "The accumulation of all powers, legislative, executive, and judiciary, in the same hands may justly be pronounced the very definition of tyranny."</span>
+        <span class="ticker-bullet">◆</span>
+        <span class="ticker-text">This design stood as the foundation of American democracy for over 230 years — a republic built on accountability, separation of powers, and the rule of law over any individual. Power flows from the people to their representatives — not downward from a single executive authority.</span>
+        <span class="ticker-bullet">◆</span>
+        <span class="ticker-text">CIVIC RESILIENCE NETWORK · civicresilience.net · Civic Education Series</span>
+        <span class="ticker-bullet">◆</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Slide B: The Unitary Executive — Power Concentrated ── -->
+<div id="slide-b" class="slide">
+  <div class="bg"></div>
+  <div class="vignette"></div>
+
+  <div class="title-card">
+    <div class="label">Constitutional Crisis Series</div>
+    <div class="headline">The Unitary Executive: Power Concentrated</div>
+    <div class="sub">What the Framers Specifically Sought to Prevent — 2024–Present</div>
+  </div>
+
+  <div class="branding">
+    <div class="name">Civic Resilience Network</div>
+    <div class="url">civicresilience.net</div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="scene-label">
+      <div class="status-dot"></div>
+      <div class="scene-name">Unitary Executive Theory — Checks &amp; Balances Undermined</div>
+    </div>
+    <div class="ticker-wrap">
+      <div class="ticker-track">
+        <span class="ticker-text">Recent Supreme Court decisions have fundamentally altered the balance of power the framers designed to prevent tyranny. In Trump v. United States (2024), the Court granted broad presidential immunity from criminal prosecution for official acts — a protection with no basis in the Constitution's text.</span>
+        <span class="ticker-bullet">◆</span>
+        <span class="ticker-text">In Loper Bright Enterprises v. Raimondo (2024), the Court overturned the Chevron doctrine, stripping federal agencies of deference on regulatory interpretation and centralizing that authority in the judiciary. Congress's ability to delegate rule-making to expert agencies — built over a century — was dismantled overnight.</span>
+        <span class="ticker-bullet">◆</span>
+        <span class="ticker-text">The "major questions doctrine" further requires Congress to speak with extraordinary specificity before agencies can act — effectively requiring legislative supermajorities for any significant regulation, while handing courts a veto over democratic policy choices.</span>
+        <span class="ticker-bullet">◆</span>
+        <span class="ticker-text">The Unitary Executive Theory holds that all executive power is vested solely in the President, who may direct or remove any executive officer at will. The framers rejected this exact concentration of authority. They created independent offices, a divided legislature, and judicial independence precisely to prevent it.</span>
+        <span class="ticker-bullet">◆</span>
+        <span class="ticker-text">Madison wrote: "The accumulation of all powers in the same hands may justly be pronounced the very definition of tyranny." The question now before American citizens is whether the constitutional architecture will hold — and whether civic institutions can be strengthened to restore the balance the framers intended.</span>
+        <span class="ticker-bullet">◆</span>
+        <span class="ticker-text">CIVIC RESILIENCE NETWORK · civicresilience.net · Constitutional Crisis Series</span>
+        <span class="ticker-bullet">◆</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Progress bar shows how long until next slide -->
+<div id="progress-bar"></div>
+
+<script>
+const HOLD_MS   = 45000;   // seconds each slide is shown
+const FADE_MS   = 2000;    // CSS transition duration (must match CSS)
+
+const slides    = [document.getElementById('slide-a'), document.getElementById('slide-b')];
+const progress  = document.getElementById('progress-bar');
+let current     = 0;
+let startTime   = Date.now();
+
+function animateProgress() {
+  const elapsed = Date.now() - startTime;
+  const pct = Math.min(elapsed / HOLD_MS * 100, 100);
+  progress.style.width = pct + '%';
+  if (elapsed < HOLD_MS) {
+    requestAnimationFrame(animateProgress);
+  }
+}
+
+function nextSlide() {
+  const prev = current;
+  current = (current + 1) % slides.length;
+
+  slides[prev].classList.remove('active');
+  slides[prev].classList.add('exiting');
+  slides[current].classList.add('active');
+
+  setTimeout(() => {
+    slides[prev].classList.remove('exiting');
+  }, FADE_MS + 100);
+
+  // Reset progress bar
+  progress.style.transition = 'none';
+  progress.style.width = '0%';
+  startTime = Date.now();
+  requestAnimationFrame(animateProgress);
+
+  setTimeout(nextSlide, HOLD_MS);
+}
+
+// Start progress animation on first slide
+requestAnimationFrame(animateProgress);
+setTimeout(nextSlide, HOLD_MS);
+</script>
+
+</body>
+</html>
