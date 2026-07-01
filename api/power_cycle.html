@@ -321,17 +321,24 @@ html, body {
 <!-- Progress bar shows how long until next slide -->
 <div id="progress-bar"></div>
 
+<!-- Click-to-start overlay (needed if CEF blocks autoplay audio) -->
+<div id="start-prompt" style="
+  position:absolute;inset:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.01);cursor:pointer;
+" onclick="document.getElementById('start-prompt').style.display='none'; safeStart();">
+</div>
+
 <script>
 const HOLD_MS = 90000;  // ms each slide is shown (matches full read-through ~90s)
 const FADE_MS = 2000;
 
 // ── Narration ─────────────────────────────────────────────────────────────────
-// To swap in AI-generated audio later, set these URLs and set USE_TTS = false.
 const AUDIO_URLS = [
-  null,   // slide A: set to 'https://api.civicresilience.net/overlay/power/audio/balance' when ready
-  null,   // slide B: set to 'https://api.civicresilience.net/overlay/power/audio/imbalance' when ready
+  'https://api.civicresilience.net/overlay/power/audio/balance',
+  'https://api.civicresilience.net/overlay/power/audio/imbalance',
 ];
-const USE_TTS = true;   // false = use AUDIO_URLS above
+const USE_TTS = false;
 
 const NARRATION = [
   // Slide A — Balance of Power
@@ -454,12 +461,22 @@ function start() {
   setTimeout(nextSlide, HOLD_MS);
 }
 
+// OBS CEF sometimes never fires onvoiceschanged — always start within 1.5s
+let _started = false;
+function safeStart() {
+  if (_started) return;
+  _started = true;
+  start();
+}
 if (window.speechSynthesis) {
   const voices = window.speechSynthesis.getVoices();
-  if (voices.length > 0) { start(); }
-  else { window.speechSynthesis.onvoiceschanged = start; }
+  if (voices.length > 0) { safeStart(); }
+  else {
+    window.speechSynthesis.onvoiceschanged = safeStart;
+    setTimeout(safeStart, 1500);   // fallback if event never fires
+  }
 } else {
-  start();
+  safeStart();
 }
 </script>
 

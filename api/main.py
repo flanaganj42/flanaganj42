@@ -420,6 +420,17 @@ async def hearing_schedule(days: int = Query(7, le=14)):
 async def hearing_committees():
     return _hearings.committee_list()
 
+@app.get("/overlay/power/audio/{scene}")
+async def power_audio(scene: str):
+    names = {"balance": "audio_balance.mp3", "imbalance": "audio_imbalance.mp3"}
+    fname = names.get(scene)
+    if not fname:
+        raise HTTPException(404, "Unknown scene")
+    p = Path(__file__).parent / fname
+    if not p.exists():
+        raise HTTPException(404, f"Audio not found: {fname}")
+    return FileResponse(str(p), media_type="audio/mpeg")
+
 @app.get("/overlay/power/image/{scene}")
 async def power_image(scene: str):
     names = {
