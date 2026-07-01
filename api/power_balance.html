@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Balance of Power — Constitutional Design</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: #000;
+  font-family: 'Georgia', serif;
+}
+
+#bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/overlay/power/image/balance');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center top;
+}
+
+/* Gradient vignette at bottom to ensure text legibility */
+#vignette {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 340px;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0,12,30,0.85) 45%, rgba(0,12,30,0.97) 100%);
+}
+
+/* Title card — top left */
+#title-card {
+  position: absolute;
+  top: 28px;
+  left: 40px;
+  background: rgba(0,40,100,0.88);
+  border-left: 5px solid #3b82f6;
+  padding: 14px 28px 14px 22px;
+  backdrop-filter: blur(6px);
+}
+#title-card .label {
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: #93c5fd;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+#title-card .headline {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+#title-card .sub {
+  font-size: 15px;
+  color: #bfdbfe;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+/* Branding bug — top right */
+#branding {
+  position: absolute;
+  top: 28px;
+  right: 40px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(59,130,246,0.4);
+  border-radius: 6px;
+  padding: 8px 16px;
+  text-align: center;
+  backdrop-filter: blur(6px);
+}
+#branding .name {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: #60a5fa;
+  text-transform: uppercase;
+}
+#branding .url {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* Bottom bar */
+#bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 0 18px 0;
+}
+
+#scene-label {
+  padding: 0 40px 10px 40px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  flex-shrink: 0;
+}
+.scene-name {
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #22c55e;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Scrolling text ticker */
+#ticker-wrap {
+  overflow: hidden;
+  border-top: 1px solid rgba(59,130,246,0.5);
+  border-bottom: 1px solid rgba(59,130,246,0.3);
+  background: rgba(0,20,60,0.7);
+  padding: 16px 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+}
+
+#ticker-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: scroll 90s linear infinite;
+  will-change: transform;
+}
+
+@keyframes scroll {
+  0%   { transform: translateX(1920px); }
+  100% { transform: translateX(-100%); }
+}
+
+.ticker-text {
+  font-size: 18px;
+  color: #e2e8f0;
+  font-family: 'Georgia', serif;
+  line-height: 1.4;
+  padding: 0 60px;
+}
+.ticker-bullet {
+  color: #3b82f6;
+  font-size: 22px;
+  padding: 0 20px;
+}
+</style>
+</head>
+<body>
+
+<div id="bg"></div>
+<div id="vignette"></div>
+
+<div id="title-card">
+  <div class="label">Civic Education Series</div>
+  <div class="headline">The Constitutional Balance of Power</div>
+  <div class="sub">Original Design — Ratified 1788</div>
+</div>
+
+<div id="branding">
+  <div class="name">Civic Resilience Network</div>
+  <div class="url">civicresilience.net</div>
+</div>
+
+<div id="bottom-bar">
+  <div id="scene-label">
+    <div class="status-dot"></div>
+    <div class="scene-name">Historical Framework — Three Co-Equal Branches</div>
+  </div>
+  <div id="ticker-wrap">
+    <div id="ticker-track">
+      <span class="ticker-text">
+        The framers of the U.S. Constitution deliberately fragmented power to prevent tyranny.
+        Three co-equal branches — Legislative, Executive, and Judicial — were granted distinct, enumerated powers.
+        Congress alone writes law and controls the federal purse.
+        The President executes law but cannot make it unilaterally.
+        Courts interpret law but cannot enforce it.
+      </span>
+      <span class="ticker-bullet">◆</span>
+      <span class="ticker-text">
+        Each branch was given tools to limit the others.
+        Congress can impeach the President and override vetoes.
+        The President can veto legislation and nominate judges.
+        Courts can strike down laws and executive actions as unconstitutional.
+      </span>
+      <span class="ticker-bullet">◆</span>
+      <span class="ticker-text">
+        James Madison warned in Federalist No. 47: "The accumulation of all powers, legislative, executive, and judiciary, in the same hands may justly be pronounced the very definition of tyranny."
+      </span>
+      <span class="ticker-bullet">◆</span>
+      <span class="ticker-text">
+        This design stood as the foundation of American democracy for over 230 years —
+        a republic built on accountability, separation of powers, and the rule of law over any individual.
+      </span>
+      <span class="ticker-bullet">◆</span>
+      <span class="ticker-text">
+        Power flows from the people to their representatives — not downward from a single executive authority.
+        The presidency was designed to be powerful but bound — answerable to Congress, the courts, and the Constitution itself.
+      </span>
+      <span class="ticker-bullet">◆</span>
+      <span class="ticker-text">CIVIC RESILIENCE NETWORK · civicresilience.net · Civic Education Series</span>
+      <span class="ticker-bullet">◆</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Unitary Executive — Power Concentrated</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: #0a0000;
+  font-family: 'Georgia', serif;
+}
+
+#bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/overlay/power/image/imbalance');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center top;
+}
+
+#vignette {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 360px;
+  background: linear-gradient(to bottom, transparent 0%, rgba(20,0,0,0.85) 45%, rgba(20,0,0,0.97) 100%);
+}
+
+/* Title card — top left */
+#title-card {
+  position: absolute;
+  top: 28px;
+  left: 40px;
+  background: rgba(100,0,0,0.85);
+  border-left: 5px solid #ef4444;
+  padding: 14px 28px 14px 22px;
+  backdrop-filter: blur(6px);
+}
+#title-card .label {
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: #fca5a5;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+#title-card .headline {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+#title-card .sub {
+  font-size: 15px;
+  color: #fecaca;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+/* Warning badge */
+#warning-badge {
+  position: absolute;
+  top: 28px;
+  right: 40px;
+  background: rgba(127,0,0,0.75);
+  border: 1px solid rgba(239,68,68,0.6);
+  border-radius: 6px;
+  padding: 10px 18px;
+  text-align: center;
+  backdrop-filter: blur(6px);
+}
+#warning-badge .warn-label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: #f87171;
+  text-transform: uppercase;
+}
+#warning-badge .warn-url {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* Bottom bar */
+#bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 0 18px 0;
+}
+
+#scene-label {
+  padding: 0 40px 10px 40px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 10px #ef4444;
+  animation: pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+.scene-name {
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ef4444;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Scrolling text ticker */
+#ticker-wrap {
+  overflow: hidden;
+  border-top: 1px solid rgba(239,68,68,0.5);
+  border-bottom: 1px solid rgba(239,68,68,0.3);
+  background: rgba(30,0,0,0.8);
+  padding: 16px 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+}
+
+#ticker-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: scroll 110s linear infinite;
+  will-change: transform;
+}
+
+@keyframes scroll {
+  0%   { transform: translateX(1920px); }
+  100% { transform: translateX(-100%); }
+}
+
+.ticker-text {
+  font-size: 18px;
+  color: #fef2f2;
+  font-family: 'Georgia', serif;
+  line-height: 1.4;
+  padding: 0 60px;
+}
+.ticker-bullet {
+  color: #ef4444;
+  font-size: 22px;
+  padding: 0 20px;
+}
+</style>
+</head>
+<body>
+
+<div id="bg"></div>
+<div id="vignette"></div>
+
+<div id="title-card">
+  <div class="label">Constitutional Crisis Series</div>
+  <div class="headline">The Unitary Executive: Power Concentrated</div>
+  <div class="sub">What the Framers Specifically Sought to Prevent — 2024–Present</div>
+</div>
+
+<div id="warning-badge">
+  <div class="warn-label">Civic Resilience Network</div>
+  <div class="warn-url">civicresilience.net</div>
+</div>
+
+<div id="bottom-bar">
+  <div id="scene-label">
+    <div class="status-dot"></div>
+    <div class="scene-name">Unitary Executive Theory — Checks & Balances Undermined</div>
+  </div>
+  <div id="ticker-wrap">
+    <div id="ticker-track">
+      <span class="ticker-text">
+        Recent Supreme Court decisions have fundamentally altered the balance of power the framers designed to prevent tyranny.
+        In Trump v. United States (2024), the Court granted broad presidential immunity from criminal prosecution for official acts —
+        a protection with no basis in the Constitution's text.
+      </span>
+      <span class="ticker-bullet">◆</span>
+      <span class="ticker-text">
+        In Loper Bright Enterprises v. Raimondo (2024), the Court overturned the Chevron doctrine,
+        stripping federal agencies of deference on regulatory interpretation and centralizing that authority in the judiciary.
+        Congress's ability to delegate rule-making to expert agencies — built over a century — was dismantled overnight.
+      </span>
+      <span class="ticker-bullet">◆</span>
+      <span class="ticker-text">
+        The "major questions doctrine" further requires Congress to speak with extraordinary specificity before agencies can act —
+        effectively requiring legislative supermajorities for any significant regulation,
+        while handing courts a veto over democratic policy choices.
+      </span>
+      <span class="ticker-bullet">◆</span>
+      <span class="ticker-text">
+        The Unitary Executive Theory holds that all executive power is vested solely in the President,
+        who may direct or remove any executive officer at will.
+        The framers rejected this exact concentration of authority.
+        They created independent offices, a divided legislature, and judicial independence precisely to prevent it.
+      </span>
+      <span class="ticker-bullet">◆</span>
+      <span class="ticker-text">
+        The practical result: a presidency increasingly insulated from legal accountability,
+        a judiciary with expanded authority over national policy,
+        and a Congress whose legislative power is hollowed out by executive orders and judicial override.
+        This is not a partisan observation — it is a constitutional one.
+      </span>
+      <span class="ticker-bullet">◆</span>
+      <span class="ticker-text">
+        Madison wrote: "The accumulation of all powers in the same hands may justly be pronounced the very definition of tyranny."
+        The question now before American citizens is whether the constitutional architecture will hold —
+        and whether civic institutions can be strengthened to restore the balance the framers intended.
+      </span>
+      <span class="ticker-bullet">◆</span>
+      <span class="ticker-text">CIVIC RESILIENCE NETWORK · civicresilience.net · Constitutional Crisis Series</span>
+      <span class="ticker-bullet">◆</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

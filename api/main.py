@@ -420,6 +420,34 @@ async def hearing_schedule(days: int = Query(7, le=14)):
 async def hearing_committees():
     return _hearings.committee_list()
 
+@app.get("/overlay/power/image/{scene}")
+async def power_image(scene: str):
+    names = {
+        "balance":   "Balance_of_Power_Status_Quo.png",
+        "imbalance": "Balance_of_Power_Corrupted_Now.png",
+    }
+    fname = names.get(scene)
+    if not fname:
+        raise HTTPException(404, "Unknown scene")
+    p = Path("/Volumes/SharedData/OBS") / fname
+    if not p.exists():
+        raise HTTPException(404, f"Image not found: {fname}")
+    return FileResponse(str(p), media_type="image/png")
+
+@app.get("/overlay/power/balance", response_class=HTMLResponse)
+async def power_balance_overlay():
+    p = Path(__file__).parent / "power_balance.html"
+    if not p.exists():
+        raise HTTPException(404, "power_balance.html not found")
+    return p.read_text()
+
+@app.get("/overlay/power/imbalance", response_class=HTMLResponse)
+async def power_imbalance_overlay():
+    p = Path(__file__).parent / "power_imbalance.html"
+    if not p.exists():
+        raise HTTPException(404, "power_imbalance.html not found")
+    return p.read_text()
+
 @app.get("/elections", response_class=HTMLResponse)
 async def elections_page():
     p = Path(__file__).parent / "elections.html"

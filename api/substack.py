@@ -35,6 +35,7 @@ PUBLISH_HOURS  = [7, 19]            # 7 AM and 7 PM local time
 
 # ── Publish history (in-memory) ───────────────────────────────────────────────
 _history: list[dict] = []
+_published_titles: set[str] = set()   # dedup: normalized titles published this session
 _lock = threading.Lock()
 
 
@@ -264,6 +265,10 @@ def publish_draft(draft_id: int) -> dict:
     })
 
 
+def _norm_title(t: str) -> str:
+    return re.sub(r'\W+', ' ', t).strip().lower()[:80]
+
+
 def publish_story(story: dict, all_stories: list[dict] | None = None) -> dict:
     """Full pipeline: generate digest + editorial → create draft → publish."""
     started = datetime.now(timezone.utc).isoformat()
@@ -286,6 +291,8 @@ def publish_story(story: dict, all_stories: list[dict] | None = None) -> dict:
             "was_fallback": editorial.get("_fallback", False),
             "published_at": datetime.now(timezone.utc).isoformat(),
         }
+        with _lock:
+            _published_titles.add(_norm_title(story.get("title", "")))
     except Exception as e:
         record = {
             "status": "error",
@@ -317,9 +324,15 @@ def _scheduler():
             if slot != last_slot:
                 last_slot = slot
                 try:
-                    feed = _news.get_feed(limit=30)
+                    feed = _news.get_feed(limit=60)
                     if feed:
-                        best = max(feed, key=lambda s: (
+                        # Filter already-published stories
+                        with _lock:
+                            seen = set(_published_titles)
+                        candidates = [s for s in feed if _norm_title(s.get("title","")) not in seen]
+                        if not candidates:
+                            candidates = feed   # reset if we've exhausted the feed
+                        best = max(candidates, key=lambda s: (
                             s.get("uplifted", 0),
                             s.get("civic_score", 0),
                             s.get("coverage_count", 1),
