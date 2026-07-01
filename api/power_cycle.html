@@ -322,21 +322,110 @@ html, body {
 <div id="progress-bar"></div>
 
 <script>
-const HOLD_MS   = 45000;   // seconds each slide is shown
-const FADE_MS   = 2000;    // CSS transition duration (must match CSS)
+const HOLD_MS = 90000;  // ms each slide is shown (matches full read-through ~90s)
+const FADE_MS = 2000;
 
-const slides    = [document.getElementById('slide-a'), document.getElementById('slide-b')];
-const progress  = document.getElementById('progress-bar');
-let current     = 0;
-let startTime   = Date.now();
+// ── Narration ─────────────────────────────────────────────────────────────────
+// To swap in AI-generated audio later, set these URLs and set USE_TTS = false.
+const AUDIO_URLS = [
+  null,   // slide A: set to 'https://api.civicresilience.net/overlay/power/audio/balance' when ready
+  null,   // slide B: set to 'https://api.civicresilience.net/overlay/power/audio/imbalance' when ready
+];
+const USE_TTS = true;   // false = use AUDIO_URLS above
+
+const NARRATION = [
+  // Slide A — Balance of Power
+  `The framers of the United States Constitution deliberately fragmented power to prevent tyranny.
+  Three co-equal branches — Legislative, Executive, and Judicial — were granted distinct, enumerated powers.
+  Congress alone writes law and controls the federal purse.
+  The President executes law but cannot make it unilaterally.
+  Courts interpret law but cannot enforce it.
+  Each branch was given specific tools to limit the others.
+  Congress can impeach the President and override vetoes.
+  The President can veto legislation and nominate judges.
+  Courts can strike down laws and executive actions as unconstitutional.
+  James Madison warned in Federalist No. 47:
+  The accumulation of all powers — legislative, executive, and judiciary — in the same hands,
+  may justly be pronounced the very definition of tyranny.
+  This design stood as the foundation of American democracy for over two hundred and thirty years —
+  a republic built on accountability, separation of powers, and the rule of law above any individual.
+  Power flows from the people to their representatives —
+  not downward from a single executive authority.
+  A Civic Resilience Network presentation.`,
+
+  // Slide B — Unitary Executive
+  `Recent Supreme Court decisions have fundamentally altered the balance of power
+  the framers designed to prevent tyranny.
+  In Trump versus United States, decided in 2024,
+  the Court granted broad presidential immunity from criminal prosecution for official acts —
+  a protection with no basis in the Constitution's text.
+  In Loper Bright Enterprises versus Raimondo, also 2024,
+  the Court overturned the Chevron doctrine,
+  stripping federal agencies of regulatory deference
+  and centralizing that authority in the judiciary.
+  Congress's ability to delegate rule-making to expert agencies —
+  built over a century — was dismantled overnight.
+  The major questions doctrine further requires Congress to speak
+  with extraordinary specificity before agencies can act —
+  effectively handing courts a veto over democratic policy choices.
+  The Unitary Executive Theory holds that all executive power
+  is vested solely in the President,
+  who may direct or remove any executive officer at will.
+  The framers rejected this exact concentration of authority.
+  They created independent offices, a divided legislature,
+  and judicial independence precisely to prevent it.
+  Madison wrote: The accumulation of all powers in the same hands
+  may justly be pronounced the very definition of tyranny.
+  The question now before American citizens
+  is whether the constitutional architecture will hold —
+  and whether civic institutions can be strengthened
+  to restore the balance the framers intended.
+  A Civic Resilience Network presentation.`,
+];
+
+// ── Audio engine ──────────────────────────────────────────────────────────────
+let _audio = null;
+
+function stopAudio() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  if (_audio) { _audio.pause(); _audio.currentTime = 0; _audio = null; }
+}
+
+function playNarration(idx) {
+  stopAudio();
+  if (USE_TTS) {
+    if (!window.speechSynthesis) return;
+    const utter = new SpeechSynthesisUtterance(NARRATION[idx]);
+    utter.rate  = 0.88;   // slightly slower for documentary feel
+    utter.pitch = 0.95;
+    // Prefer a deep male voice on macOS (Alex, Daniel, etc.)
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v =>
+      /alex|daniel|arthur|fred|bruce|ralph/i.test(v.name) && v.lang.startsWith('en')
+    ) || voices.find(v => v.lang === 'en-US' && v.name.toLowerCase().includes('male'))
+      || voices.find(v => v.lang.startsWith('en'));
+    if (preferred) utter.voice = preferred;
+    window.speechSynthesis.speak(utter);
+  } else {
+    const url = AUDIO_URLS[idx];
+    if (!url) return;
+    _audio = new Audio(url);
+    _audio.volume = 1.0;
+    _audio.play().catch(() => {});
+  }
+}
+
+// ── Slide controller ──────────────────────────────────────────────────────────
+const slides   = [document.getElementById('slide-a'), document.getElementById('slide-b')];
+const progress = document.getElementById('progress-bar');
+let current    = 0;
+let startTime  = Date.now();
 
 function animateProgress() {
   const elapsed = Date.now() - startTime;
   const pct = Math.min(elapsed / HOLD_MS * 100, 100);
   progress.style.width = pct + '%';
-  if (elapsed < HOLD_MS) {
-    requestAnimationFrame(animateProgress);
-  }
+  if (elapsed < HOLD_MS) requestAnimationFrame(animateProgress);
 }
 
 function nextSlide() {
@@ -347,22 +436,31 @@ function nextSlide() {
   slides[prev].classList.add('exiting');
   slides[current].classList.add('active');
 
-  setTimeout(() => {
-    slides[prev].classList.remove('exiting');
-  }, FADE_MS + 100);
+  setTimeout(() => slides[prev].classList.remove('exiting'), FADE_MS + 100);
 
-  // Reset progress bar
   progress.style.transition = 'none';
   progress.style.width = '0%';
   startTime = Date.now();
   requestAnimationFrame(animateProgress);
 
+  playNarration(current);
   setTimeout(nextSlide, HOLD_MS);
 }
 
-// Start progress animation on first slide
-requestAnimationFrame(animateProgress);
-setTimeout(nextSlide, HOLD_MS);
+// Voices load async in some browsers — wait for them before first play
+function start() {
+  requestAnimationFrame(animateProgress);
+  playNarration(0);
+  setTimeout(nextSlide, HOLD_MS);
+}
+
+if (window.speechSynthesis) {
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length > 0) { start(); }
+  else { window.speechSynthesis.onvoiceschanged = start; }
+} else {
+  start();
+}
 </script>
 
 </body>
